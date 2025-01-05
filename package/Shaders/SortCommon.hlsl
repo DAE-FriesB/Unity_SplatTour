@@ -24,11 +24,12 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
  ******************************************************************************/
+
 #define KEYS_PER_THREAD     15U 
 #define D_DIM               256U
 #define PART_SIZE           3840U
 #define D_TOTAL_SMEM        4096U
-
+#define UNROLL_AMT          4U
 #define RADIX               256U    //Number of digit bins
 #define RADIX_MASK          255U    //Mask of digit bins
 #define HALF_RADIX          128U    //For smaller waves where bit packing is necessary
@@ -53,6 +54,9 @@ RWStructuredBuffer<int> b_alt;
 #elif defined(KEY_FLOAT)
 RWStructuredBuffer<float> b_sort;
 RWStructuredBuffer<float> b_alt;
+#else
+RWStructuredBuffer<uint> b_sort;
+RWStructuredBuffer<uint> b_alt;
 #endif
 
 #if defined(PAYLOAD_UINT)
@@ -64,6 +68,9 @@ RWStructuredBuffer<int> b_altPayload;
 #elif defined(PAYLOAD_FLOAT)
 RWStructuredBuffer<float> b_sortPayload;
 RWStructuredBuffer<float> b_altPayload;
+#else
+RWStructuredBuffer<uint> b_sortPayload;
+RWStructuredBuffer<uint> b_altPayload;
 #endif
 
 groupshared uint g_d[D_TOTAL_SMEM]; //Shared memory for DigitBinningPass and DownSweep kernels
@@ -95,9 +102,11 @@ struct DigitStruct
 //HELPER FUNCTIONS
 //*****************************************************************************
 //Due to a bug with SPIRV pre 1.6, we cannot use WaveGetLaneCount() to get the currently active wavesize 
-inline uint getWaveSize()
+inline uint GetWaveSize()
 {
-#if defined(VULKAN)
+    return 32;
+#if defined(WebGPU)
+#elif defined(VULKAN)
     GroupMemoryBarrierWithGroupSync(); //Make absolutely sure the wave is not diverged here
     return dot(countbits(WaveActiveBallot(true)), uint4(1, 1, 1, 1));
 #else
@@ -105,10 +114,76 @@ inline uint getWaveSize()
 #endif
 }
 
+inline uint getLaneIndex(uint gtid)
+{
+#if defined(WebGPU)
+    return gtid % GetWaveSize();
+#else
+    return WaveGetLaneIndex();
+#endif
+}
+
+#if defined(WebGPU)
+inline void  GroupMemoryBarrierWithGroupSync() {}
+
+groupshared uint laneBuffer[32]; // Adjust size based on wave size
+
+inline uint4 WaveActiveBallot(bool predicate)
+{
+    uint ballot[4] = {0,0,0,0};
+    for (uint i = 0; i < 32; ++i)
+    {
+        if (predicate)
+        {
+            ballot[i / 32] |= (1 << (i % 32));
+        }
+    }
+    GroupMemoryBarrierWithGroupSync();
+    return uint4(ballot[0],ballot[1],ballot[2],ballot[3]);
+}
+
+#endif
+
+inline uint ReadLaneAt(uint value, uint lane, uint gtid)
+{
+#if defined(WebGPU)
+    laneBuffer[getLaneIndex(gtid)] = value;
+    GroupMemoryBarrierWithGroupSync();
+    return laneBuffer[lane];
+#else
+    return WaveReadLaneAt(value, lane);
+#endif
+}
+
+
+inline uint PrefixSum(uint value, uint gtid)
+{
+#if defined(WebGPU)
+    uint lane = getLaneIndex(gtid);
+    laneBuffer[lane] = value;
+    GroupMemoryBarrierWithGroupSync();
+
+    for (uint offset = 1; offset < GetWaveSize(); offset *= 2)
+    {
+        uint t = (lane >= offset) ? laneBuffer[lane - offset] : 0;
+        GroupMemoryBarrierWithGroupSync();
+        laneBuffer[lane] += t;
+        GroupMemoryBarrierWithGroupSync();
+    }
+
+    return laneBuffer[lane];
+#else
+    return WavePrefixSum(value);
+#endif
+}
+
+
 inline uint getWaveIndex(uint gtid, uint waveSize)
 {
     return gtid / waveSize;
 }
+
+
 
 //Radix Tricks by Michael Herf
 //http://stereopsis.com/radix.html
@@ -171,7 +246,11 @@ inline uint SubPartSizeWGE16(uint waveSize)
 
 inline uint SharedOffsetWGE16(uint gtid, uint waveSize)
 {
+#if defined(WebGPU)
+    return getLaneIndex(gtid) + getWaveIndex(gtid, waveSize) * SubPartSizeWGE16(waveSize);
+#else
     return WaveGetLaneIndex() + getWaveIndex(gtid, waveSize) * SubPartSizeWGE16(waveSize);
+#endif
 }
 
 inline uint SubPartSizeWLT16(uint waveSize, uint _serialIterations)
@@ -181,7 +260,9 @@ inline uint SubPartSizeWLT16(uint waveSize, uint _serialIterations)
 
 inline uint SharedOffsetWLT16(uint gtid, uint waveSize, uint _serialIterations)
 {
-    return WaveGetLaneIndex() +
+    const uint laneIdx = getLaneIndex(gtid);
+
+    return laneIdx +
         (getWaveIndex(gtid, waveSize) / _serialIterations * SubPartSizeWLT16(waveSize, _serialIterations)) +
         (getWaveIndex(gtid, waveSize) % _serialIterations * waveSize);
 }
@@ -238,6 +319,8 @@ inline void LoadKey(inout uint key, uint index)
     key = UintToInt(b_sort[index]);
 #elif defined(KEY_FLOAT)
     key = FloatToUint(b_sort[index]);
+#else
+    key = b_sort[index];
 #endif
 }
 
@@ -291,15 +374,16 @@ inline KeyStruct LoadKeysPartialWGE16(uint gtid, uint waveSize, uint partIndex)
 inline KeyStruct LoadKeysPartialWLT16(uint gtid, uint waveSize, uint partIndex, uint serialIterations)
 {
     KeyStruct keys;
+    uint t = DeviceOffsetWLT16(gtid, waveSize, partIndex, serialIterations);
     [unroll]
-    for (uint i = 0, t = DeviceOffsetWLT16(gtid, waveSize, partIndex, serialIterations);
-        i < KEYS_PER_THREAD;
-        ++i, t += waveSize * serialIterations)
+    for (uint i = 0; i < KEYS_PER_THREAD;++i)
     {
         if (t < e_numKeys)
             LoadKey(keys.k[i], t);
         else
             LoadDummyKey(keys.k[i]);
+
+        t += waveSize * serialIterations;
     }
     return keys;
 }
@@ -330,16 +414,18 @@ inline void WarpLevelMultiSplitWGE16(uint key, inout uint4 waveFlags)
     }
 }
 
-inline uint2 CountBitsWGE16(uint waveSize, uint ltMask, uint4 waveFlags)
+inline uint2 CountBitsWGE16(uint gtid, uint waveSize, uint ltMask, uint4 waveFlags)
 {
     uint2 count = uint2(0, 0);
     
+    uint laneIndex = getLaneIndex(gtid);
+
     for(uint wavePart = 0; wavePart < waveSize; wavePart += 32)
     {
         uint t = countbits(waveFlags[wavePart >> 5]);
-        if (WaveGetLaneIndex() >= wavePart)
+        if (laneIndex >= wavePart)
         {
-            if (WaveGetLaneIndex() >= wavePart + 32)
+            if (laneIndex >= wavePart + 32)
                 count.x += t;
             else
                 count.x += countbits(waveFlags[wavePart >> 5] & ltMask);
@@ -361,13 +447,16 @@ inline void WarpLevelMultiSplitWLT16(uint key, inout uint waveFlags)
 }
 
 inline OffsetStruct RankKeysWGE16(
+    uint gtid,
     uint waveSize,
     uint waveOffset,
     KeyStruct keys)
 {
     OffsetStruct offsets;
+    
+    const uint laneIndex = getLaneIndex(gtid);
     const uint initialFlags = WaveFlagsWGE16(waveSize);
-    const uint ltMask = (1U << (WaveGetLaneIndex() & 31)) - 1;
+    const uint ltMask = (1U << (laneIndex & 31)) - 1;
     
     [unroll]
     for (uint i = 0; i < KEYS_PER_THREAD; ++i)
@@ -376,7 +465,7 @@ inline OffsetStruct RankKeysWGE16(
         WarpLevelMultiSplitWGE16(keys.k[i], waveFlags);
         
         const uint index = ExtractDigit(keys.k[i]) + waveOffset;
-        const uint2 bitCount = CountBitsWGE16(waveSize, ltMask, waveFlags);
+        const uint2 bitCount = CountBitsWGE16(gtid, waveSize, ltMask, waveFlags);
         
         offsets.o[i] = g_d[index] + bitCount.x;
         GroupMemoryBarrierWithGroupSync();
@@ -388,10 +477,15 @@ inline OffsetStruct RankKeysWGE16(
     return offsets;
 }
 
-inline OffsetStruct RankKeysWLT16(uint waveSize, uint waveIndex, KeyStruct keys, uint serialIterations)
+inline OffsetStruct RankKeysWLT16(uint gtid, uint waveSize, uint waveIndex, KeyStruct keys, uint serialIterations)
 {
     OffsetStruct offsets;
-    const uint ltMask = (1U << WaveGetLaneIndex()) - 1;
+#if defined(WebGPU)
+    const uint laneIndex = getLaneIndex(gtid);
+#else
+    const uint laneIndex = WaveGetLaneIndex();
+#endif
+    const uint ltMask = (1U << laneIndex) - 1;
     const uint initialFlags = WaveFlagsWLT16(waveSize);
     
     [unroll]
@@ -446,22 +540,37 @@ inline uint WaveHistInclusiveScanCircularShiftWLT16(uint gtid)
 
 inline void WaveHistReductionExclusiveScanWGE16(uint gtid, uint waveSize, uint histReduction)
 {
+#if defined(WebGPU)
+    const uint laneIndex = getLaneIndex(gtid);
+#else
+    const uint laneIndex = WaveGetLaneIndex();
+#endif
     if (gtid < RADIX)
     {
         const uint laneMask = waveSize - 1;
-        g_d[((WaveGetLaneIndex() + 1) & laneMask) + (gtid & ~laneMask)] = histReduction;
+        g_d[((laneIndex + 1) & laneMask) + (gtid & ~laneMask)] = histReduction;
     }
     GroupMemoryBarrierWithGroupSync();
                 
     if (gtid < RADIX / waveSize)
     {
+#if defined(WebGPU)
+        g_d[gtid * waveSize] =
+            PrefixSum(g_d[gtid * waveSize], gtid);
+#else
         g_d[gtid * waveSize] =
             WavePrefixSum(g_d[gtid * waveSize]);
+#endif
     }
     GroupMemoryBarrierWithGroupSync();
     
+#if defined(WebGPU)
+    uint t = ReadLaneAt(g_d[gtid], 0, gtid);
+#else
     uint t = WaveReadLaneAt(g_d[gtid], 0);
-    if (gtid < RADIX && WaveGetLaneIndex())
+#endif
+
+    if (gtid < RADIX && laneIndex)
         g_d[gtid] += t;
 }
 
@@ -470,7 +579,8 @@ inline void WaveHistReductionExclusiveScanWGE16(uint gtid, uint waveSize, uint h
 inline void WaveHistReductionExclusiveScanWLT16(uint gtid)
 {
     uint shift = 1;
-    for (uint j = RADIX >> 2; j > 0; j >>= 1)
+    uint j = 0;
+    for (j = RADIX >> 2; j > 0; j >>= 1)
     {
         GroupMemoryBarrierWithGroupSync();
         if (gtid < j)
@@ -485,7 +595,7 @@ inline void WaveHistReductionExclusiveScanWLT16(uint gtid)
     if (gtid == 0)
         g_d[HALF_RADIX - 1] &= 0xffff;
                 
-    for (uint j = 1; j < RADIX >> 1; j <<= 1)
+    for ( j = 1; j < RADIX >> 1; j <<= 1)
     {
         --shift;
         GroupMemoryBarrierWithGroupSync();
@@ -527,7 +637,9 @@ inline void UpdateOffsetsWGE16(
     {
         [unroll]
         for (uint i = 0; i < KEYS_PER_THREAD; ++i)
+        {
             offsets.o[i] += g_d[ExtractDigit(keys.k[i])];
+        }
     }
 }
 
@@ -576,6 +688,8 @@ inline void WriteKey(uint deviceIndex, uint groupSharedIndex)
     b_alt[deviceIndex] = UintToInt(g_d[groupSharedIndex]);
 #elif defined(KEY_FLOAT)
     b_alt[deviceIndex] = UintToFloat(g_d[groupSharedIndex]);
+#else
+    b_alt[deviceIndex] = g_d[groupSharedIndex];
 #endif
 }
 
@@ -585,6 +699,8 @@ inline void LoadPayload(inout uint payload, uint deviceIndex)
     payload = b_sortPayload[deviceIndex];
 #elif defined(PAYLOAD_INT) || defined(PAYLOAD_FLOAT)
     payload = asuint(b_sortPayload[deviceIndex]);
+#else
+    payload = b_sortPayload[deviceIndex];
 #endif
 }
 
@@ -601,6 +717,8 @@ inline void WritePayload(uint deviceIndex, uint groupSharedIndex)
     b_altPayload[deviceIndex] = asint(g_d[groupSharedIndex]);
 #elif defined(PAYLOAD_FLOAT)
     b_altPayload[deviceIndex] = asfloat(g_d[groupSharedIndex]);
+#else
+    b_altPayload[deviceIndex] = g_d[groupSharedIndex];
 #endif
 }
 
@@ -674,12 +792,12 @@ inline void LoadPayloadsWGE16(
     uint partIndex,
     inout KeyStruct payloads)
 {
-    [unroll]
-    for (uint i = 0, t = DeviceOffsetWGE16(gtid, waveSize, partIndex);
-        i < KEYS_PER_THREAD;
-        ++i, t += waveSize)
+    uint t = DeviceOffsetWGE16(gtid, waveSize, partIndex);
+    //[unroll]
+    for (uint i = 0; i < KEYS_PER_THREAD; ++i)
     {
         LoadPayload(payloads.k[i], t);
+        t += waveSize;
     }
 }
 
@@ -690,7 +808,7 @@ inline void LoadPayloadsWLT16(
     uint serialIterations,
     inout KeyStruct payloads)
 {
-    [unroll]
+    //[unroll]
     for (uint i = 0, t = DeviceOffsetWLT16(gtid, waveSize, partIndex, serialIterations);
         i < KEYS_PER_THREAD;
         ++i, t += waveSize * serialIterations)

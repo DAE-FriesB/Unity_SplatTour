@@ -5103,7 +5103,7 @@ MonoBehaviour:
   m_SHOnly: 0
   m_SortNthFrame: 1
   m_RenderMode: 0
-  m_PointDisplaySize: 3
+  m_PointDisplaySize: 8.06
   m_Cutouts: []
   m_ShaderSplats: {fileID: 4800000, guid: ed800126ae8844a67aad1974ddddd59c, type: 3}
   m_ShaderComposite: {fileID: 4800000, guid: 7e184af7d01193a408eb916d8acafff9, type: 3}

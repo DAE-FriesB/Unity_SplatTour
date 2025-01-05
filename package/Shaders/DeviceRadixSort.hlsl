@@ -56,6 +56,7 @@ inline void HistogramDigitCounts(uint gtid, uint gid)
         e_numKeys : (gid + 1) * PART_SIZE;
     for (uint i = gtid + gid * PART_SIZE; i < partitionEnd; i += US_DIM)
     {
+#if defined(KEY_UINT)
         InterlockedAdd(g_us[ExtractDigit(b_sort[i]) + histOffset], 1);
 #elif defined(KEY_INT)
         InterlockedAdd(g_us[ExtractDigit(IntToUint(b_sort[i])) + histOffset], 1);

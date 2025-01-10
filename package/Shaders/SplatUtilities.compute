@@ -3,20 +3,7 @@
 //#define WebGPU
 
 #pragma kernel CSSetIndices
-#pragma kernel CSCalcDistances
 #pragma kernel CSCalcViewData
-#pragma kernel CSUpdateEditData
-#pragma kernel CSInitEditData
-#pragma kernel CSClearBuffer
-#pragma kernel CSInvertSelection
-#pragma kernel CSSelectAll
-#pragma kernel CSOrBuffers
-#pragma kernel CSSelectionUpdate
-#pragma kernel CSTranslateSelection
-#pragma kernel CSRotateSelection
-#pragma kernel CSScaleSelection
-#pragma kernel CSExportData
-#pragma kernel CSCopySplats
 
 // DeviceRadixSort
 #define KEY_UINT
@@ -24,21 +11,12 @@
 #define SHOULD_ASCEND
 #define SORT_PAIRS
 #pragma multi_compile __ VULKAN
-#pragma kernel InitDeviceRadixSort
-#pragma kernel Upsweep
-#pragma kernel Scan
-#pragma kernel Downsweep
+
 
 // GPU sorting needs wave ops
-#if defined(WebGPU)
-#else
-#pragma require wavebasic
-#pragma require waveballot
-#endif 
 
 #pragma use_dxc
 
-#include "DeviceRadixSort.hlsl"
 #include "GaussianSplatting.hlsl"
 #include "UnityCG.cginc"
 
@@ -71,20 +49,6 @@ void CSSetIndices (uint3 id : SV_DispatchThreadID)
     _SplatSortKeys[idx] = idx;
 }
 
-[numthreads(GROUP_SIZE,1,1)]
-void CSCalcDistances (uint3 id : SV_DispatchThreadID)
-{
-    uint idx = id.x;
-    if (idx >= _SplatCount)
-        return;
-
-    uint origIdx = _SplatSortKeys[idx];
-
-    float3 pos = LoadSplatPos(origIdx);
-    pos = mul(_MatrixMV, float4(pos.xyz, 1)).xyz;
-
-    _SplatSortDistances[idx] = FloatToSortableUint(pos.z);
-}
 
 RWStructuredBuffer<SplatViewData> _SplatViewData;
 

@@ -5101,7 +5101,7 @@ MonoBehaviour:
   m_OpacityScale: 1
   m_SHOrder: 3
   m_SHOnly: 0
-  m_SortNthFrame: 1
+  m_SortNthFrame: 30
   m_RenderMode: 0
   m_PointDisplaySize: 8.06
   m_Cutouts: []

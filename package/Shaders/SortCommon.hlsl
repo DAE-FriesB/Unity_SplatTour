@@ -45,33 +45,10 @@ cbuffer cbGpuSorting : register(b0)
     uint padding;
 };
 
-#if defined(KEY_UINT)
 RWStructuredBuffer<uint> b_sort;
 RWStructuredBuffer<uint> b_alt;
-#elif defined(KEY_INT)
-RWStructuredBuffer<int> b_sort;
-RWStructuredBuffer<int> b_alt;
-#elif defined(KEY_FLOAT)
-RWStructuredBuffer<float> b_sort;
-RWStructuredBuffer<float> b_alt;
-#else
-RWStructuredBuffer<uint> b_sort;
-RWStructuredBuffer<uint> b_alt;
-#endif
-
-#if defined(PAYLOAD_UINT)
 RWStructuredBuffer<uint> b_sortPayload;
 RWStructuredBuffer<uint> b_altPayload;
-#elif defined(PAYLOAD_INT)
-RWStructuredBuffer<int> b_sortPayload;
-RWStructuredBuffer<int> b_altPayload;
-#elif defined(PAYLOAD_FLOAT)
-RWStructuredBuffer<float> b_sortPayload;
-RWStructuredBuffer<float> b_altPayload;
-#else
-RWStructuredBuffer<uint> b_sortPayload;
-RWStructuredBuffer<uint> b_altPayload;
-#endif
 
 groupshared uint g_d[D_TOTAL_SMEM]; //Shared memory for DigitBinningPass and DownSweep kernels
 
@@ -82,20 +59,12 @@ struct KeyStruct
 
 struct OffsetStruct
 {
-#if defined(ENABLE_16_BIT)
-    uint16_t o[KEYS_PER_THREAD];
-#else
     uint o[KEYS_PER_THREAD];
-#endif
 };
 
 struct DigitStruct
 {
-#if defined(ENABLE_16_BIT)
-    uint16_t d[KEYS_PER_THREAD];
-#else
     uint d[KEYS_PER_THREAD];
-#endif
 };
 
 //*****************************************************************************

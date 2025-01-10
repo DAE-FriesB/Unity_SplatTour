@@ -112,16 +112,9 @@ namespace GaussianSplatting.Runtime
                 }
             }
 
-            //m_keyUintKeyword = new LocalKeyword(cs, "KEY_UINT");
-            //m_payloadUintKeyword = new LocalKeyword(cs, "PAYLOAD_UINT");
-            //m_ascendKeyword = new LocalKeyword(cs, "SHOULD_ASCEND");
-            //m_sortPairKeyword = new LocalKeyword(cs, "SORT_PAIRS");
+           
             m_vulkanKeyword = new LocalKeyword(cs, "VULKAN");
 
-            //cs.EnableKeyword(m_keyUintKeyword);
-            //cs.EnableKeyword(m_payloadUintKeyword);
-            //cs.EnableKeyword(m_ascendKeyword);
-            //cs.EnableKeyword(m_sortPairKeyword);
             if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Vulkan)
                 cs.EnableKeyword(m_vulkanKeyword);
             else

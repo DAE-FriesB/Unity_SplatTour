@@ -32,8 +32,8 @@
 RWStructuredBuffer<uint> b_globalHist;  //buffer holding device level offsets for each binning pass
 RWStructuredBuffer<uint> b_passHist;    //buffer used to store reduced sums of partition tiles
 
-groupshared uint g_us[RADIX * 2];   //Shared memory for upsweep
-groupshared uint g_scan[SCAN_DIM];  //Shared memory for the scan
+groupshared uint g_us[RADIX * 2];   //Shared memory for upsweep //256*2 items
+groupshared uint g_scan[SCAN_DIM];  //Shared memory for the scan //128 items
 
 //*****************************************************************************
 //INIT KERNEL
@@ -56,13 +56,18 @@ inline void HistogramDigitCounts(uint gtid, uint gid)
         e_numKeys : (gid + 1) * PART_SIZE;
     for (uint i = gtid + gid * PART_SIZE; i < partitionEnd; i += US_DIM)
     {
-#if defined(KEY_UINT)
         InterlockedAdd(g_us[ExtractDigit(b_sort[i]) + histOffset], 1);
-#elif defined(KEY_INT)
-        InterlockedAdd(g_us[ExtractDigit(IntToUint(b_sort[i])) + histOffset], 1);
-#elif defined(KEY_FLOAT)
-        InterlockedAdd(g_us[ExtractDigit(FloatToUint(b_sort[i])) + histOffset], 1);
-#endif
+    }
+}
+
+//reduce and pass to tile histogram
+inline void ReduceWriteDigitCountsW0(uint gtid, uint gid)
+{
+    for (uint i = gtid; i < RADIX; i += US_DIM)
+    {
+        g_us[i] += g_us[i + RADIX];
+        b_passHist[i * e_threadBlocks + gid] = g_us[i];
+        g_us[i] += PrefixSum(g_us[i], gtid);
     }
 }
 
@@ -75,6 +80,38 @@ inline void ReduceWriteDigitCounts(uint gtid, uint gid)
         b_passHist[i * e_threadBlocks + gid] = g_us[i];
         g_us[i] += PrefixSum(g_us[i], gtid);
     }
+}
+inline void GlobalHistExclusiveScanW0(uint gtid) 
+{
+    // Ensure all threads have written their values to g_us
+    GroupMemoryBarrierWithGroupSync();
+
+    // Perform the exclusive scan in shared memory
+    for (uint offset = 1; offset < RADIX; offset *= 2)
+    {
+        if (gtid >= offset && gtid < RADIX)
+        {
+            g_us[gtid] += g_us[gtid - offset];
+        }
+        GroupMemoryBarrierWithGroupSync();
+    }
+
+    // Convert inclusive scan to exclusive scan
+    if (gtid < RADIX)
+    {
+        uint temp = g_us[gtid];
+        g_us[gtid] = (gtid == 0) ? 0 : g_us[gtid - 1];
+        g_us[gtid - 1] = temp;
+    }
+    GroupMemoryBarrierWithGroupSync();
+
+    // Atomically add to global histogram
+    const uint globalHistOffset = GlobalHistOffset();
+    for (uint i = gtid; i < RADIX; i += US_DIM)
+    {
+        InterlockedAdd(b_globalHist[i + globalHistOffset], g_us[i]);
+    }
+
 }
 
 //Exclusive scan over digit counts, then atomically add to global hist
@@ -176,6 +213,7 @@ void Upsweep(uint3 gtid : SV_GroupThreadID, uint3 gid : SV_GroupID)
     GroupMemoryBarrierWithGroupSync();
     
     ReduceWriteDigitCounts(gtid.x, gid.x);
+    
     
     if (waveSize >= 16)
         GlobalHistExclusiveScanWGE16(gtid.x, waveSize);

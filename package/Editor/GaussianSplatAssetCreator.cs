@@ -805,18 +805,9 @@ namespace GaussianSplatting.Editor
             {
                 case GaussianSplatAsset.VectorFormat.Float32:
                 {
-                        if (convertYup)
-						{
-							*(float*)outputPtr = v.x;
-							*(float*)(outputPtr + 4) = v.z;
-							*(float*)(outputPtr + 8) = v.y;
-						}
-                        else
-                        {
-                            *(float*)outputPtr = v.x;
-                            *(float*)(outputPtr + 4) = v.y;
-                            *(float*)(outputPtr + 8) = v.z;
-                        }
+                    *(float*)outputPtr = v.x;
+                    *(float*)(outputPtr + 4) = v.y;
+                    *(float*)(outputPtr + 8) = v.z;       
                 }
                     break;
                 case GaussianSplatAsset.VectorFormat.Norm16:

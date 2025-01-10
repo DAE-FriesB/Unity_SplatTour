@@ -1,193 +1,199 @@
+using System;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Rendering;
+using static UnityEngine.Rendering.DebugUI;
 
 namespace GaussianSplatting.Runtime
 {
-    // GPU (uint key, uint payload) 8 bit-LSD radix sort, using reduce-then-scan
-    // Copyright Thomas Smith 2024, MIT license
-    // https://github.com/b0nes164/GPUSorting
 
-    public class GpuSorting
-    {
-        //The size of a threadblock partition in the sort
-        const uint DEVICE_RADIX_SORT_PARTITION_SIZE = 3840;
 
-        //The size of our radix in bits
-        const uint DEVICE_RADIX_SORT_BITS = 8;
 
-        //Number of digits in our radix, 1 << DEVICE_RADIX_SORT_BITS
-        const uint DEVICE_RADIX_SORT_RADIX = 256;
+	// GPU (uint key, uint payload) 8 bit-LSD radix sort, using reduce-then-scan
+	// Copyright Thomas Smith 2024, MIT license
+	// https://github.com/b0nes164/GPUSorting
 
-        //Number of sorting passes required to sort a 32bit key, KEY_BITS / DEVICE_RADIX_SORT_BITS
-        const uint DEVICE_RADIX_SORT_PASSES = 4;
+	public class GpuSorting
+	{
+		//The size of a threadblock partition in the sort
+		const uint DEVICE_RADIX_SORT_PARTITION_SIZE = 3840;
 
-        //Keywords to enable for the shader
-        //private LocalKeyword m_keyUintKeyword;
-        //private LocalKeyword m_payloadUintKeyword;
-        //private LocalKeyword m_ascendKeyword;
-        //private LocalKeyword m_sortPairKeyword;
-        private LocalKeyword m_vulkanKeyword;
+		//The size of our radix in bits
+		const uint DEVICE_RADIX_SORT_BITS = 8;
 
-        public struct Args
-        {
-            public uint             count;
-            public GraphicsBuffer   inputKeys;
-            public GraphicsBuffer   inputValues;
-            public SupportResources resources;
-            internal int workGroupCount;
-        }
+		//Number of digits in our radix, 1 << DEVICE_RADIX_SORT_BITS
+		const uint DEVICE_RADIX_SORT_RADIX = 256;
 
-        public struct SupportResources
-        {
-            public GraphicsBuffer altBuffer;
-            public GraphicsBuffer altPayloadBuffer;
-            public GraphicsBuffer passHistBuffer;
-            public GraphicsBuffer globalHistBuffer;
+		//Number of sorting passes required to sort a 32bit key, KEY_BITS / DEVICE_RADIX_SORT_BITS
+		const uint DEVICE_RADIX_SORT_PASSES = 4;
 
-            public static SupportResources Load(uint count)
-            {
-                //This is threadBlocks * DEVICE_RADIX_SORT_RADIX
-                uint scratchBufferSize = DivRoundUp(count, DEVICE_RADIX_SORT_PARTITION_SIZE) * DEVICE_RADIX_SORT_RADIX; 
-                uint reducedScratchBufferSize = DEVICE_RADIX_SORT_RADIX * DEVICE_RADIX_SORT_PASSES;
+		//Keywords to enable for the shader
+		//private LocalKeyword m_keyUintKeyword;
+		//private LocalKeyword m_payloadUintKeyword;
+		//private LocalKeyword m_ascendKeyword;
+		//private LocalKeyword m_sortPairKeyword;
+		private LocalKeyword m_vulkanKeyword;
 
-                var target = GraphicsBuffer.Target.Structured;
-                var resources = new SupportResources
-                {
-                    altBuffer = new GraphicsBuffer(target, (int)count, 4) { name = "DeviceRadixAlt" },
-                    altPayloadBuffer = new GraphicsBuffer(target, (int)count, 4) { name = "DeviceRadixAltPayload" },
-                    passHistBuffer = new GraphicsBuffer(target, (int)scratchBufferSize, 4) { name = "DeviceRadixPassHistogram" },
-                    globalHistBuffer = new GraphicsBuffer(target, (int)reducedScratchBufferSize, 4) { name = "DeviceRadixGlobalHistogram" },
-                };
-                return resources;
-            }
+		public struct Args
+		{
+			public uint count;
+			public GraphicsBuffer inputKeys;
+			public GraphicsBuffer inputValues;
+			public SupportResources resources;
+			internal int workGroupCount;
+		}
 
-            public void Dispose()
-            {
-                altBuffer?.Dispose();
-                altPayloadBuffer?.Dispose();
-                passHistBuffer?.Dispose();
-                globalHistBuffer?.Dispose();
+		public struct SupportResources
+		{
+			public GraphicsBuffer altBuffer;
+			public GraphicsBuffer altPayloadBuffer;
+			public GraphicsBuffer passHistBuffer;
+			public GraphicsBuffer globalHistBuffer;
 
-                altBuffer = null;
-                altPayloadBuffer = null;
-                passHistBuffer = null;
-                globalHistBuffer = null;
-            }
-        }
+			public static SupportResources Load(uint count)
+			{
+				//This is threadBlocks * DEVICE_RADIX_SORT_RADIX
+				uint scratchBufferSize = DivRoundUp(count, DEVICE_RADIX_SORT_PARTITION_SIZE) * DEVICE_RADIX_SORT_RADIX;
+				uint reducedScratchBufferSize = DEVICE_RADIX_SORT_RADIX * DEVICE_RADIX_SORT_PASSES;
 
-        readonly ComputeShader m_CS;
-        readonly int m_kernelInitDeviceRadixSort = -1;
-        readonly int m_kernelUpsweep = -1;
-        readonly int m_kernelScan = -1;
-        readonly int m_kernelDownsweep = -1;
+				var target = GraphicsBuffer.Target.Structured;
+				var resources = new SupportResources
+				{
+					altBuffer = new GraphicsBuffer(target, (int)count, 4) { name = "DeviceRadixAlt" },
+					altPayloadBuffer = new GraphicsBuffer(target, (int)count, 4) { name = "DeviceRadixAltPayload" },
+					passHistBuffer = new GraphicsBuffer(target, (int)scratchBufferSize, 4) { name = "DeviceRadixPassHistogram" },
+					globalHistBuffer = new GraphicsBuffer(target, (int)reducedScratchBufferSize, 4) { name = "DeviceRadixGlobalHistogram" },
+				};
+				return resources;
+			}
 
-        readonly bool m_Valid;
+			public void Dispose()
+			{
+				altBuffer?.Dispose();
+				altPayloadBuffer?.Dispose();
+				passHistBuffer?.Dispose();
+				globalHistBuffer?.Dispose();
 
-        public bool Valid => m_Valid;
+				altBuffer = null;
+				altPayloadBuffer = null;
+				passHistBuffer = null;
+				globalHistBuffer = null;
+			}
+		}
 
-        public GpuSorting(ComputeShader cs)
-        {
-            m_CS = cs;
-            if (cs)
-            {
-                m_kernelInitDeviceRadixSort = cs.FindKernel("InitDeviceRadixSort");
-                m_kernelUpsweep = cs.FindKernel("Upsweep");
-                m_kernelScan = cs.FindKernel("Scan");
-                m_kernelDownsweep = cs.FindKernel("Downsweep");
-            }
+		readonly ComputeShader m_CS;
+		readonly int m_kernelInitDeviceRadixSort = -1;
+		readonly int m_kernelUpsweep = -1;
+		readonly int m_kernelScan = -1;
+		readonly int m_kernelDownsweep = -1;
 
-            m_Valid = m_kernelInitDeviceRadixSort >= 0 &&
-                      m_kernelUpsweep >= 0 &&
-                      m_kernelScan >= 0 &&
-                      m_kernelDownsweep >= 0;
-            if (m_Valid)
-            {
-                if (!cs.IsSupported(m_kernelInitDeviceRadixSort) ||
-                    !cs.IsSupported(m_kernelUpsweep) ||
-                    !cs.IsSupported(m_kernelScan) ||
-                    !cs.IsSupported(m_kernelDownsweep))
-                {
-                    m_Valid = false;
-                }
-            }
+		readonly bool m_Valid;
 
-           
-            m_vulkanKeyword = new LocalKeyword(cs, "VULKAN");
+		public bool Valid => m_Valid;
 
-            if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Vulkan)
-                cs.EnableKeyword(m_vulkanKeyword);
-            else
-                cs.DisableKeyword(m_vulkanKeyword);
-        }
+		public GpuSorting(ComputeShader cs)
+		{
+			m_CS = cs;
+			if (cs)
+			{
+				m_kernelInitDeviceRadixSort = cs.FindKernel("InitDeviceRadixSort");
+				m_kernelUpsweep = cs.FindKernel("Upsweep");
+				m_kernelScan = cs.FindKernel("Scan");
+				m_kernelDownsweep = cs.FindKernel("Downsweep");
+			}
 
-        static uint DivRoundUp(uint x, uint y) => (x + y - 1) / y;
+			m_Valid = m_kernelInitDeviceRadixSort >= 0 &&
+					  m_kernelUpsweep >= 0 &&
+					  m_kernelScan >= 0 &&
+					  m_kernelDownsweep >= 0;
+			if (m_Valid)
+			{
+				if (!cs.IsSupported(m_kernelInitDeviceRadixSort) ||
+					!cs.IsSupported(m_kernelUpsweep) ||
+					!cs.IsSupported(m_kernelScan) ||
+					!cs.IsSupported(m_kernelDownsweep))
+				{
+					m_Valid = false;
+				}
+			}
 
-        //Can we remove the last 4 padding without breaking?
-        struct SortConstants
-        {
-            public uint numKeys;                        // The number of keys to sort
-            public uint radixShift;                     // The radix shift value for the current pass
-            public uint threadBlocks;                   // threadBlocks
-            public uint padding0;                       // Padding - unused
-        }
 
-        public void Dispatch(CommandBuffer cmd, Args args)
-        {
-            Assert.IsTrue(Valid);
+			m_vulkanKeyword = new LocalKeyword(cs, "VULKAN");
 
-            GraphicsBuffer srcKeyBuffer = args.inputKeys;
-            GraphicsBuffer srcPayloadBuffer = args.inputValues;
-            GraphicsBuffer dstKeyBuffer = args.resources.altBuffer;
-            GraphicsBuffer dstPayloadBuffer = args.resources.altPayloadBuffer;
+			if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Vulkan)
+				cs.EnableKeyword(m_vulkanKeyword);
+			else
+				cs.DisableKeyword(m_vulkanKeyword);
+		}
 
-            SortConstants constants = default;
-            constants.numKeys = args.count;
-            constants.threadBlocks = DivRoundUp(args.count, DEVICE_RADIX_SORT_PARTITION_SIZE);
+		static uint DivRoundUp(uint x, uint y) => (x + y - 1) / y;
 
-            // Setup overall constants
-            cmd.SetComputeIntParam(m_CS, "e_numKeys", (int)constants.numKeys);
-            cmd.SetComputeIntParam(m_CS, "e_threadBlocks", (int)constants.threadBlocks);
+		//Can we remove the last 4 padding without breaking?
+		struct SortConstants
+		{
+			public uint numKeys;                        // The number of keys to sort
+			public uint radixShift;                     // The radix shift value for the current pass
+			public uint threadBlocks;                   // threadBlocks
+			public uint padding0;                       // Padding - unused
+		}
 
-            //Set statically located buffers
-            //Upsweep
-            cmd.SetComputeBufferParam(m_CS, m_kernelUpsweep, "b_passHist", args.resources.passHistBuffer);
-            cmd.SetComputeBufferParam(m_CS, m_kernelUpsweep, "b_globalHist", args.resources.globalHistBuffer);
+		public void Dispatch(CommandBuffer cmd, Args args)
+		{
+			Assert.IsTrue(Valid);
 
-            //Scan
-            cmd.SetComputeBufferParam(m_CS, m_kernelScan, "b_passHist", args.resources.passHistBuffer);
+			GraphicsBuffer srcKeyBuffer = args.inputKeys;
+			GraphicsBuffer srcPayloadBuffer = args.inputValues;
+			GraphicsBuffer dstKeyBuffer = args.resources.altBuffer;
+			GraphicsBuffer dstPayloadBuffer = args.resources.altPayloadBuffer;
 
-            //Downsweep
-            cmd.SetComputeBufferParam(m_CS, m_kernelDownsweep, "b_passHist", args.resources.passHistBuffer);
-            cmd.SetComputeBufferParam(m_CS, m_kernelDownsweep, "b_globalHist", args.resources.globalHistBuffer);
+			SortConstants constants = default;
+			constants.numKeys = args.count;
+			constants.threadBlocks = DivRoundUp(args.count, DEVICE_RADIX_SORT_PARTITION_SIZE);
 
-            //Clear the global histogram
-            cmd.SetComputeBufferParam(m_CS, m_kernelInitDeviceRadixSort, "b_globalHist", args.resources.globalHistBuffer);
-            cmd.DispatchCompute(m_CS, m_kernelInitDeviceRadixSort, 1, 1, 1);
+			// Setup overall constants
+			cmd.SetComputeIntParam(m_CS, "e_numKeys", (int)constants.numKeys);
+			cmd.SetComputeIntParam(m_CS, "e_threadBlocks", (int)constants.threadBlocks);
 
-            // Execute the sort algorithm in 8-bit increments
-            for (constants.radixShift = 0; constants.radixShift < 32; constants.radixShift += DEVICE_RADIX_SORT_BITS)
-            {
-                cmd.SetComputeIntParam(m_CS, "e_radixShift", (int)constants.radixShift);
+			//Set statically located buffers
+			//Upsweep
+			cmd.SetComputeBufferParam(m_CS, m_kernelUpsweep, "b_passHist", args.resources.passHistBuffer);
+			cmd.SetComputeBufferParam(m_CS, m_kernelUpsweep, "b_globalHist", args.resources.globalHistBuffer);
 
-                //Upsweep
-                cmd.SetComputeBufferParam(m_CS, m_kernelUpsweep, "b_sort", srcKeyBuffer);
-                cmd.DispatchCompute(m_CS, m_kernelUpsweep, (int)constants.threadBlocks, 1, 1);
+			//Scan
+			cmd.SetComputeBufferParam(m_CS, m_kernelScan, "b_passHist", args.resources.passHistBuffer);
 
-                // Scan
-                cmd.DispatchCompute(m_CS, m_kernelScan, (int)DEVICE_RADIX_SORT_RADIX, 1, 1);
+			//Downsweep
+			cmd.SetComputeBufferParam(m_CS, m_kernelDownsweep, "b_passHist", args.resources.passHistBuffer);
+			cmd.SetComputeBufferParam(m_CS, m_kernelDownsweep, "b_globalHist", args.resources.globalHistBuffer);
 
-                // Downsweep
-                cmd.SetComputeBufferParam(m_CS, m_kernelDownsweep, "b_sort", srcKeyBuffer);
-                cmd.SetComputeBufferParam(m_CS, m_kernelDownsweep, "b_sortPayload", srcPayloadBuffer);
-                cmd.SetComputeBufferParam(m_CS, m_kernelDownsweep, "b_alt", dstKeyBuffer);
-                cmd.SetComputeBufferParam(m_CS, m_kernelDownsweep, "b_altPayload", dstPayloadBuffer);
-                cmd.DispatchCompute(m_CS, m_kernelDownsweep, (int)constants.threadBlocks, 1, 1);
+			//Clear the global histogram
+			cmd.SetComputeBufferParam(m_CS, m_kernelInitDeviceRadixSort, "b_globalHist", args.resources.globalHistBuffer);
+			cmd.DispatchCompute(m_CS, m_kernelInitDeviceRadixSort, 1, 1, 1);
 
-                // Swap
-                (srcKeyBuffer, dstKeyBuffer) = (dstKeyBuffer, srcKeyBuffer);
-                (srcPayloadBuffer, dstPayloadBuffer) = (dstPayloadBuffer, srcPayloadBuffer);
-            }
-        }
-    }
+			// Execute the sort algorithm in 8-bit increments
+			for (constants.radixShift = 0; constants.radixShift < 32; constants.radixShift += DEVICE_RADIX_SORT_BITS)
+			{
+				cmd.SetComputeIntParam(m_CS, "e_radixShift", (int)constants.radixShift);
+
+				//Upsweep
+				cmd.SetComputeBufferParam(m_CS, m_kernelUpsweep, "b_sort", srcKeyBuffer);
+				cmd.DispatchCompute(m_CS, m_kernelUpsweep, (int)constants.threadBlocks, 1, 1);
+
+				// Scan
+				cmd.DispatchCompute(m_CS, m_kernelScan, (int)DEVICE_RADIX_SORT_RADIX, 1, 1);
+
+				// Downsweep
+				cmd.SetComputeBufferParam(m_CS, m_kernelDownsweep, "b_sort", srcKeyBuffer);
+				cmd.SetComputeBufferParam(m_CS, m_kernelDownsweep, "b_sortPayload", srcPayloadBuffer);
+				cmd.SetComputeBufferParam(m_CS, m_kernelDownsweep, "b_alt", dstKeyBuffer);
+				cmd.SetComputeBufferParam(m_CS, m_kernelDownsweep, "b_altPayload", dstPayloadBuffer);
+				cmd.DispatchCompute(m_CS, m_kernelDownsweep, (int)constants.threadBlocks, 1, 1);
+
+				// Swap
+				(srcKeyBuffer, dstKeyBuffer) = (dstKeyBuffer, srcKeyBuffer);
+				(srcPayloadBuffer, dstPayloadBuffer) = (dstPayloadBuffer, srcPayloadBuffer);
+			}
+		}
+	}
 }

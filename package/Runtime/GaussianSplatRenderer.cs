@@ -279,9 +279,6 @@ namespace GaussianSplatting.Runtime
 			public static readonly int SplatOther = Shader.PropertyToID("_SplatOther");
 			public static readonly int SplatSH = Shader.PropertyToID("_SplatSH");
 			public static readonly int SplatColor = Shader.PropertyToID("_SplatColor");
-			public static readonly int SplatSelectedBits = Shader.PropertyToID("_SplatSelectedBits");
-			public static readonly int SplatDeletedBits = Shader.PropertyToID("_SplatDeletedBits");
-			public static readonly int SplatBitsValid = Shader.PropertyToID("_SplatBitsValid");
 			public static readonly int SplatFormat = Shader.PropertyToID("_SplatFormat");
 			public static readonly int SplatChunks = Shader.PropertyToID("_SplatChunks");
 			public static readonly int SplatChunkCount = Shader.PropertyToID("_SplatChunkCount");
@@ -298,22 +295,12 @@ namespace GaussianSplatting.Runtime
 			public static readonly int GaussianSplatRT = Shader.PropertyToID("_GaussianSplatRT");
 			public static readonly int SplatSortKeys = Shader.PropertyToID("_SplatSortKeys");
 			public static readonly int SplatSortDistances = Shader.PropertyToID("_SplatSortDistances");
-			public static readonly int SrcBuffer = Shader.PropertyToID("_SrcBuffer");
-			public static readonly int DstBuffer = Shader.PropertyToID("_DstBuffer");
-			public static readonly int BufferSize = Shader.PropertyToID("_BufferSize");
 			public static readonly int MatrixMV = Shader.PropertyToID("_MatrixMV");
 			public static readonly int MatrixObjectToWorld = Shader.PropertyToID("_MatrixObjectToWorld");
 			public static readonly int MatrixWorldToObject = Shader.PropertyToID("_MatrixWorldToObject");
 			public static readonly int VecScreenParams = Shader.PropertyToID("_VecScreenParams");
 			public static readonly int VecWorldSpaceCameraPos = Shader.PropertyToID("_VecWorldSpaceCameraPos");
-			public static readonly int SelectionCenter = Shader.PropertyToID("_SelectionCenter");
-			public static readonly int SelectionDelta = Shader.PropertyToID("_SelectionDelta");
-			public static readonly int SelectionDeltaRot = Shader.PropertyToID("_SelectionDeltaRot");
-			public static readonly int SplatCutoutsCount = Shader.PropertyToID("_SplatCutoutsCount");
-			public static readonly int SplatCutouts = Shader.PropertyToID("_SplatCutouts");
-			public static readonly int SelectionMode = Shader.PropertyToID("_SelectionMode");
-			public static readonly int SplatPosMouseDown = Shader.PropertyToID("_SplatPosMouseDown");
-			public static readonly int SplatOtherMouseDown = Shader.PropertyToID("_SplatOtherMouseDown");
+
 		}
 
 		[field: NonSerialized] public bool editModified { get; private set; }
@@ -460,8 +447,8 @@ namespace GaussianSplatting.Runtime
 			cmb.SetComputeIntParam(cs, Props.SplatCount, m_SplatCount);
 			cmb.SetComputeIntParam(cs, Props.SplatChunkCount, m_GpuChunksValid ? m_GpuChunks.count : 0);
 
-			UpdateCutoutsBuffer();
-			cmb.SetComputeIntParam(cs, Props.SplatCutoutsCount, m_Cutouts?.Length ?? 0);
+			//UpdateCutoutsBuffer();
+			//cmb.SetComputeIntParam(cs, Props.SplatCutoutsCount, m_Cutouts?.Length ?? 0);
 		}
 
 		internal void SetAssetDataOnMaterial(MaterialPropertyBlock mat)
@@ -630,12 +617,6 @@ namespace GaussianSplatting.Runtime
 
 		void UnionGraphicsBuffers(GraphicsBuffer dst, GraphicsBuffer src)
 		{
-		}
-
-		static float SortableUintToFloat(uint v)
-		{
-			uint mask = ((v >> 31) - 1) | 0x80000000u;
-			return math.asfloat(v ^ mask);
 		}
 
 		public void UpdateEditCountsAndBounds()

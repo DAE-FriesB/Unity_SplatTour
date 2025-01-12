@@ -423,11 +423,11 @@ namespace GaussianSplatting.Runtime
 
 			//sort test code
 
-			//uint[] values = new uint[] { 33, 32, 31, 30, 29, 28,27,26, 19,18,14,12, 2,1 };
-			//uint[] indices = new uint[values.Length];
+			uint[] values = new uint[] { 33, 32, 31, 30, 29, 28, 27, 26, 19, 18, 14, 12, 2, 1 };
+			uint[] indices = new uint[values.Length];
 
-			//CPUSorting sorting = new CPUSorting(values, indices);
-			//sorting.Sort();
+			CPUSorting sorting = new CPUSorting((uint)values.Length);
+			sorting.Sort(ref values, ref indices);
 		}
 
 		void SetAssetDataOnCS(CommandBuffer cmb, KernelIndices kernel)

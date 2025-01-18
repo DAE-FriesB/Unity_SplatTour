@@ -24,8 +24,15 @@ public class VirtualTourInput : MonoBehaviour
 	private Coroutine _moveCoroutine = null;
 	private float _speed = 0f;
 
-	VirtualTourRaycaster _rayCaster;
-	CameraRotationInput _cameraRotationInput;
+	public Camera Camera => _camera;
+	public LayerMask LayerMask => _wallsAndFloorLayers;
+	public IndicatorModel IndicatorModel => _indicatorModel;
+
+	//Expose for injection for autoplay
+	public VirtualTourRaycaster _rayCaster { get; set; }
+	public CameraRotationInput _cameraRotationInput { get; set; }
+
+
 
 	private void Awake()
 	{
@@ -49,19 +56,27 @@ public class VirtualTourInput : MonoBehaviour
 			_indicatorModel.Mode = IndicatorModel.DecalMode.Hidden;
 			return;
 		}
-		
+
 		_rayCaster.Update();
 
 		if (_indicatorModel.Mode == IndicatorModel.DecalMode.Available && Input.GetMouseButtonDown(0))
 		{
-			_moveCoroutine = StartCoroutine(AnimateMove(_indicatorModel.Position));
+			StartMove();
 		}
+	}
+
+	public bool StartMove()
+	{
+		if (_indicatorModel.Mode != IndicatorModel.DecalMode.Available) return false;
+
+		_moveCoroutine = StartCoroutine(AnimateMove(_indicatorModel.Position));
+		return true;
 	}
 
 	IEnumerator AnimateMove(Vector3 targetPosition)
 	{
 		Vector3 targetPos = targetPosition + Vector3.up * _cameraHeight;
-		
+
 		_speed = 0f;
 
 		while (!ReachedTarget(targetPos, out float distSq))
@@ -76,7 +91,7 @@ public class VirtualTourInput : MonoBehaviour
 			else
 			{
 				_speed -= Time.deltaTime * _moveAcceleration;
-				
+
 			}
 			_speed = Mathf.Clamp(_speed, 0f, _maxMoveSpeed);
 
@@ -88,6 +103,8 @@ public class VirtualTourInput : MonoBehaviour
 		transform.position = targetPos;
 		_moveCoroutine = null;
 	}
+
+	public bool IsMoving => _moveCoroutine != null;
 	private bool ReachedTarget(Vector3 targetPos, out float distSq)
 	{
 		distSq = (transform.position - targetPos).sqrMagnitude;

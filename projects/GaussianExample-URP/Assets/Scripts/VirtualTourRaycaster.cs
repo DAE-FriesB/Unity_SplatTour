@@ -3,7 +3,7 @@ using UnityEngine.AI;
 
 public class VirtualTourRaycaster
 {
-	private readonly Camera _camera;
+	protected readonly Camera _camera;
 	private readonly IndicatorModel _indicator;
 	private readonly LayerMask _wallsAndFloorMask;
 
@@ -17,9 +17,7 @@ public class VirtualTourRaycaster
 	}
 	public void Update()
 	{
-		Vector3 mousePos = Input.mousePosition;
-		mousePos.z = 10f;
-		Ray r = _camera.ScreenPointToRay(mousePos);
+		Ray r = CalculateMouseRay();
 		if (Physics.Raycast(r, out RaycastHit hit, _camera.farClipPlane, _wallsAndFloorMask))
 		{
 			if (hit.collider.CompareTag("Floor"))
@@ -48,5 +46,13 @@ public class VirtualTourRaycaster
 		{
 			_indicator.Mode = IndicatorModel.DecalMode.Hidden;
 		}
+	}
+
+	protected virtual Ray CalculateMouseRay()
+	{
+		Vector3 mousePos = Input.mousePosition;
+		mousePos.z = 10f;
+		Ray r = _camera.ScreenPointToRay(mousePos);
+		return r;
 	}
 }

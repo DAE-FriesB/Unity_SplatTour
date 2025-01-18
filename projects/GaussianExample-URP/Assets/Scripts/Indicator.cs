@@ -60,7 +60,7 @@ public class Indicator : PresenterBase<IndicatorModel>
 	public void Awake()
 	{
 		Model = new IndicatorModel();
-
+		Model.Position = transform.position;
 		_decalMaterial = new Material(_decalRenderer.sharedMaterial);
 		_decalRenderer.sharedMaterial = _decalMaterial;
 		_defaultColor = _decalMaterial.color;

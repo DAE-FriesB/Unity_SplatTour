@@ -1,0 +1,42 @@
+#fpsCounter{
+    font-family: "Courier New", Courier, monospace;
+    position: absolute;
+    top: 0px;
+    right:0px;
+    width: 100px;
+    height: 20px;
+    background-color: #000;
+    color: #fff;
+}
+#frameTimesChart{
+    display: inline;
+    align-self: center;
+}
+
+#log-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#logTable {
+    font-family: "Courier New", Courier, monospace;
+    color: #333;
+    background-color: #d3d3d3; /* Light gray background color */
+    border-collapse: collapse;
+    width: auto;
+    font-size: 12px; /* Adjust the font size as needed */
+    margin: 20px; /* Add margin to the table */
+    max-width: 1200px;;
+}
+
+#logTable th, #logTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#logTable th {
+    background-color: #a9a9a9; /* Darker gray background for headers */
+    color: black; /* Black text for headers */
+    text-align: left;
+}

@@ -6,7 +6,10 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/GSTestScene.unity
+    path: Assets/Scenes/Benchmarking.unity
+    guid: 554d1cbf4d11a6f4f8c2346001003990
+  - enabled: 1
+    path: Assets/Scenes/GSTestScene.unity
     guid: 36934c1e75cb24745a91b0a1124a3179
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

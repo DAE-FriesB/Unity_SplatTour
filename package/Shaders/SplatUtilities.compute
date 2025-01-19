@@ -4,19 +4,22 @@
 
 #pragma kernel CSSetIndices
 #pragma kernel CSCalcViewData
+#pragma kernel CSCalcDistances
 
 // DeviceRadixSort
+#pragma kernel CSInitCounts
+#pragma kernel CSRadixCount
+#pragma kernel CSPrefixSum
+#pragma kernel CSRadixSort
+
 #define KEY_UINT
 #define PAYLOAD_UINT
 #define SHOULD_ASCEND
 #define SORT_PAIRS
 #pragma multi_compile __ VULKAN
 
-
-// GPU sorting needs wave ops
-
 #pragma use_dxc
-
+#include "DeviceRadixSort.hlsl"
 #include "GaussianSplatting.hlsl"
 #include "UnityCG.cginc"
 
@@ -37,6 +40,12 @@ uint FloatToSortableUint(float f)
     uint mask = -((int)(fu >> 31)) | 0x80000000;
     return fu ^ mask;
 }
+//float SortableUintToFloat(uint f)
+//{
+//    uint mask = ((f >> 31) - 1) | 0x80000000;
+//    return asfloat(f ^ mask);
+//}
+
 
 [numthreads(GROUP_SIZE,1,1)]
 void CSSetIndices (uint3 id : SV_DispatchThreadID)
@@ -46,6 +55,21 @@ void CSSetIndices (uint3 id : SV_DispatchThreadID)
         return;
 
     _SplatSortKeys[idx] = idx;
+}
+
+[numthreads(GROUP_SIZE, 1, 1)]
+void CSCalcDistances(uint3 id : SV_DispatchThreadID)
+{
+    uint idx = id.x;
+    if (idx >= _SplatCount)
+        return;
+
+    uint origIdx = _SplatSortKeys[idx];
+
+    float3 pos = LoadSplatPos(origIdx);
+     pos = mul(_MatrixMV, float4(pos.xyz, 1));
+
+    _SplatSortDistances[idx] = FloatToSortableUint(pos.z);
 }
 
 

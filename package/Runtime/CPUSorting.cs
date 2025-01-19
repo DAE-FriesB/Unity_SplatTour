@@ -35,19 +35,6 @@ namespace GaussianSplatting.Runtime
 			}
 		}
 
-		private static uint GetMax(ref uint[] inputValues, int n)
-		{
-			uint max = inputValues[0];
-			for (int i = 1; i < n; i++)
-			{
-				if (inputValues[i] > max)
-				{
-					max = inputValues[i];
-				}
-			}
-			return max;
-		}
-
 		private static uint GetBaseValue(uint value, int shiftAmount)
 		{
 			value = (value >> shiftAmount) & _shiftMask;
@@ -68,6 +55,7 @@ namespace GaussianSplatting.Runtime
 				_countArr[baseValue]++;
 			}
 
+			//PrefixSum
 			for (int i = 1; i < _base; i++)
 			{
 				_countArr[i] += _countArr[i - 1];

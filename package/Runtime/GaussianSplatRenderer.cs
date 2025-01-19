@@ -136,6 +136,7 @@ namespace GaussianSplatting.Runtime
 				mpb.SetBuffer(GaussianSplatRenderer.Props.SplatChunks, gs.m_GpuChunks);
 
 				mpb.SetBuffer(GaussianSplatRenderer.Props.SplatViewData, gs.m_GpuView);
+				//mpb.SetBuffer(GaussianSplatRenderer.Props.SplatSortDistances, gs.m_GpuSortDistances);
 				mpb.SetBuffer(GaussianSplatRenderer.Props.OrderBuffer, gs.m_GpuSortKeys);
 				mpb.SetFloat(GaussianSplatRenderer.Props.SplatScale, gs.m_SplatScale);
 				mpb.SetFloat(GaussianSplatRenderer.Props.SplatOpacityScale, gs.m_OpacityScale);
@@ -245,9 +246,9 @@ namespace GaussianSplatting.Runtime
 		public ComputeShader m_CSSplatUtilities;
 
 		int m_SplatCount; // initially same as asset splat count, but editing can change this
-		uint[] m_GpuSortDistances;
-		uint[] m_GpuSortIndices;
-
+		//uint[] m_CPUSortDistances;
+		//uint[] m_CPUSortKeys;
+		internal GraphicsBuffer m_GpuSortDistances;
 		internal GraphicsBuffer m_GpuSortKeys;
 
 		GraphicsBuffer m_GpuPosData;
@@ -259,8 +260,9 @@ namespace GaussianSplatting.Runtime
 		internal GraphicsBuffer m_GpuView;
 		internal GraphicsBuffer m_GpuIndexBuffer;
 
-		CPUSorting m_Sorter;
-		CPUDistanceCalculator m_distCalculator;
+		GpuSorting m_Sorter;
+		GpuSorting.Args m_SorterArgs;
+		//CPUDistanceCalculator m_distCalculator;
 
 		internal Material m_MatSplats;
 		internal Material m_MatComposite;
@@ -315,7 +317,12 @@ namespace GaussianSplatting.Runtime
 		enum KernelIndices
 		{
 			SetIndices,
-			CalcViewData
+			CalcViewData,
+			CalcDistances,
+			InitCounts,
+			RadixCount,
+			PrefixSum,
+			RadixSort
 		}
 
 		public bool HasValidAsset =>
@@ -340,8 +347,9 @@ namespace GaussianSplatting.Runtime
 
 			NativeArray<uint> posData = asset.posData.GetData<uint>();
 			m_GpuPosData.SetData(posData);
-			m_distCalculator = new CPUDistanceCalculator(posData,GaussianSplatAsset.GetVectorSize(asset.posFormat),m_SplatCount);
-			
+			//m_distCalculator = new CPUDistanceCalculator(posData,GaussianSplatAsset.GetVectorSize(asset.posFormat),m_SplatCount);
+
+
 			
 			m_GpuOtherData = new GraphicsBuffer(GraphicsBuffer.Target.Raw | GraphicsBuffer.Target.CopySource, (int)(asset.otherData.dataSize / 4), 4) { name = "GaussianOtherData" };
 			m_GpuOtherData.SetData(asset.otherData.GetData<uint>());
@@ -389,18 +397,28 @@ namespace GaussianSplatting.Runtime
 
 		void InitSortBuffers(int count)
 		{
+			m_GpuSortDistances?.Dispose();
+			m_GpuSortKeys?.Dispose();
+			m_SorterArgs.resources.Dispose();
+			//m_GpuSortDistances = new uint[count];
+			//m_GpuSortIndices = new uint[count];
 
-			m_GpuSortDistances = new uint[count];
-			m_GpuSortIndices = new uint[count];
 			m_GpuSortKeys = new GraphicsBuffer(GraphicsBuffer.Target.Structured, count, 4) { name = "GaussianSplatSortIndices" };
-
+			m_GpuSortDistances = new GraphicsBuffer(GraphicsBuffer.Target.Structured, count, 4) { name = "GaussianSplatSortDistances" };
 			// init keys buffer to splat indices
-			////m_CSSplatUtilities.SetBuffer((int)KernelIndices.SetIndices, Props.SplatSortKeys, m_GpuSortKeys);
-			//m_CSSplatUtilities.SetInt(Props.SplatCount, count);
-			//m_CSSplatUtilities.GetKernelThreadGroupSizes((int)KernelIndices.SetIndices, out uint gsX, out _, out _);
-			//m_CSSplatUtilities.Dispatch((int)KernelIndices.SetIndices, (count + (int)gsX - 1) / (int)gsX, 1, 1);
-			m_Sorter = new CPUSorting((uint)count);
-			m_Sorter.InitializeIndices(ref m_GpuSortIndices);
+			m_CSSplatUtilities.SetBuffer((int)KernelIndices.SetIndices, Props.SplatSortKeys, m_GpuSortKeys);
+			m_CSSplatUtilities.SetInt(Props.SplatCount, count);
+			m_CSSplatUtilities.GetKernelThreadGroupSizes((int)KernelIndices.SetIndices, out uint gsX, out _, out _);
+			m_CSSplatUtilities.Dispatch((int)KernelIndices.SetIndices, (count + (int)gsX - 1) / (int)gsX, 1, 1);
+
+
+			m_SorterArgs.inputKeys = m_GpuSortKeys;
+			m_SorterArgs.inputValues = m_GpuSortDistances ;
+			m_SorterArgs.count = (uint)count;
+			if (m_Sorter.Valid)
+				m_SorterArgs.resources = GpuSorting.SupportResources.Load((uint)count);
+			//m_Sorter = new CPUSorting((uint)count);
+			//m_Sorter.InitializeIndices(ref m_CPUSortKeys);
 		}
 
 		public void OnEnable()
@@ -416,6 +434,7 @@ namespace GaussianSplatting.Runtime
 			m_MatDebugPoints = new Material(m_ShaderDebugPoints) { name = "GaussianDebugPoints" };
 			m_MatDebugBoxes = new Material(m_ShaderDebugBoxes) { name = "GaussianDebugBoxes" };
 
+			m_Sorter = new GpuSorting(m_CSSplatUtilities);
 			GaussianSplatRenderSystem.instance.RegisterSplat(this);
 
 			CreateResourcesForAsset();
@@ -423,11 +442,11 @@ namespace GaussianSplatting.Runtime
 
 			//sort test code
 
-			uint[] values = new uint[] { 33, 32, 31, 30, 29, 28, 27, 26, 19, 18, 14, 12, 2, 1 };
-			uint[] indices = new uint[values.Length];
+			//uint[] values = new uint[] { 33, 32, 31, 30, 29, 28, 27, 26, 19, 18, 14, 12, 2, 1 };
+			//uint[] indices = new uint[values.Length];
 
-			CPUSorting sorting = new CPUSorting((uint)values.Length);
-			sorting.Sort(ref values, ref indices);
+			//CPUSorting sorting = new CPUSorting((uint)values.Length);
+			//sorting.Sort(ref values, ref indices);
 		}
 
 		void SetAssetDataOnCS(CommandBuffer cmb, KernelIndices kernel)
@@ -480,10 +499,10 @@ namespace GaussianSplatting.Runtime
 
 			DisposeBuffer(ref m_GpuView);
 			DisposeBuffer(ref m_GpuIndexBuffer);
-			//DisposeBuffer(ref m_GpuSortDistances);
+			DisposeBuffer(ref m_GpuSortDistances);
 			DisposeBuffer(ref m_GpuSortKeys);
 
-			//m_SorterArgs.resources.Dispose();
+			m_SorterArgs.resources.Dispose();
 
 			m_SplatCount = 0;
 			m_GpuChunksValid = false;
@@ -550,31 +569,27 @@ namespace GaussianSplatting.Runtime
 			worldToCamMatrix.m21 *= -1;
 			worldToCamMatrix.m22 *= -1;
 
-			Vector3 camPosInv = worldToCamMatrix.inverse.MultiplyPoint(cam.transform.position);
-			float camScale = 1 / cam.farClipPlane;
-			camScale *= camScale;
 			//// calculate distance to the camera for each splat
 			//cmd.BeginSample(s_ProfSort);
-			//cmd.SetComputeBufferParam(m_CSSplatUtilities, (int)KernelIndices.CalcDistances, Props.SplatSortDistances, m_GpuSortDistances);
-			//cmd.SetComputeBufferParam(m_CSSplatUtilities, (int)KernelIndices.CalcDistances, Props.SplatSortKeys, m_GpuSortKeys);
-			//cmd.SetComputeBufferParam(m_CSSplatUtilities, (int)KernelIndices.CalcDistances, Props.SplatChunks, m_GpuChunks);
-			//cmd.SetComputeBufferParam(m_CSSplatUtilities, (int)KernelIndices.CalcDistances, Props.SplatPos, m_GpuPosData);
-			//cmd.SetComputeIntParam(m_CSSplatUtilities, Props.SplatFormat, (int)m_Asset.posFormat);
-			//cmd.SetComputeMatrixParam(m_CSSplatUtilities, Props.MatrixMV, worldToCamMatrix * matrix);
-			//cmd.SetComputeIntParam(m_CSSplatUtilities, Props.SplatCount, m_SplatCount);
-			//cmd.SetComputeIntParam(m_CSSplatUtilities, Props.SplatChunkCount, m_GpuChunksValid ? m_GpuChunks.count : 0);
-			//m_CSSplatUtilities.GetKernelThreadGroupSizes((int)KernelIndices.CalcDistances, out uint gsX, out _, out _);
-			//cmd.DispatchCompute(m_CSSplatUtilities, (int)KernelIndices.CalcDistances, (m_GpuSortDistances.count + (int)gsX - 1)/(int)gsX, 1, 1);
-			m_distCalculator.CalcDistances(worldToCamMatrix*matrix, ref m_GpuSortIndices, ref m_GpuSortDistances);
-			//m_distCalculator.CalcDistances(camPosInv, camScale, ref m_GpuSortIndices, ref m_GpuSortDistances);
+			cmd.SetComputeBufferParam(m_CSSplatUtilities, (int)KernelIndices.CalcDistances, Props.SplatSortDistances, m_GpuSortDistances);
+			cmd.SetComputeBufferParam(m_CSSplatUtilities, (int)KernelIndices.CalcDistances, Props.SplatSortKeys, m_GpuSortKeys);
+			cmd.SetComputeBufferParam(m_CSSplatUtilities, (int)KernelIndices.CalcDistances, Props.SplatChunks, m_GpuChunks);
+			cmd.SetComputeBufferParam(m_CSSplatUtilities, (int)KernelIndices.CalcDistances, Props.SplatPos, m_GpuPosData);
+			cmd.SetComputeIntParam(m_CSSplatUtilities, Props.SplatFormat, (int)m_Asset.posFormat);
+			cmd.SetComputeMatrixParam(m_CSSplatUtilities, Props.MatrixMV, worldToCamMatrix * matrix);
+			cmd.SetComputeIntParam(m_CSSplatUtilities, Props.SplatCount, m_SplatCount);
+			cmd.SetComputeIntParam(m_CSSplatUtilities, Props.SplatChunkCount, m_GpuChunksValid ? m_GpuChunks.count : 0);
+			m_CSSplatUtilities.GetKernelThreadGroupSizes((int)KernelIndices.CalcDistances, out uint gsX, out _, out _);
+			cmd.DispatchCompute(m_CSSplatUtilities, (int)KernelIndices.CalcDistances, (m_GpuSortDistances.count + (int)gsX - 1)/(int)gsX, 1, 1);
+			//m_distCalculator.CalcDistances(worldToCamMatrix*matrix, ref m_CPUSortKeys, ref m_CPUSortDistances);
 			//// sort the splats
-			m_Sorter.Sort(ref m_GpuSortDistances, ref m_GpuSortIndices);
-			//m_Sorter.Dispatch(cmd, m_SorterArgs);
+			//m_Sorter.Sort(ref m_CPUSortDistances, ref m_CPUSortKeys);
+			m_Sorter.Dispatch(cmd, m_SorterArgs);
 			//cmd.EndSample(s_ProfSort);
 
 
 			//Copy sorted indices to the buffer
-			m_GpuSortKeys.SetData(m_GpuSortIndices);
+			//m_GpuSortKeys.SetData(m_CPUSortKeys);
 		}
 
 		public void Update()

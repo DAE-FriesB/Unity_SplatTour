@@ -32,6 +32,7 @@ StructuredBuffer<SplatViewData> _SplatViewData;
 ByteAddressBuffer _SplatSelectedBits;
 uint _SplatBitsValid;
 
+
 v2f vert (uint vtxID : SV_VertexID, uint instID : SV_InstanceID)
 {
     v2f o = (v2f)0;
@@ -39,12 +40,13 @@ v2f vert (uint vtxID : SV_VertexID, uint instID : SV_InstanceID)
 	SplatViewData view = _SplatViewData[instID];
 	float4 centerClipPos = view.pos;
 	bool behindCam = centerClipPos.w <= 0;
+	
 	if (behindCam)
 	{
 		o.vertex = asfloat(0x7fc00000); // NaN discards the primitive
 	}
 	else
-	{
+	{		
 		o.col.r = f16tof32(view.color.x >> 16);
 		o.col.g = f16tof32(view.color.x);
 		o.col.b = f16tof32(view.color.y >> 16);
@@ -79,6 +81,8 @@ half4 frag (v2f i) : SV_Target
 {
 	float power = -dot(i.pos, i.pos);
 	half alpha = exp(power);
+
+	
 	if (i.col.a >= 0)
 	{
 		alpha = saturate(alpha * i.col.a);

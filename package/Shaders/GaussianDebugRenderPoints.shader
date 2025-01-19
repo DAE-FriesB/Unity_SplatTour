@@ -52,8 +52,10 @@ v2f vert (uint vtxID : SV_VertexID, uint instID : SV_InstanceID)
         o.color.g = frac((float)splatIndex / (float)_SplatCount * 10);
         o.color.b = (float)splatIndex / (float)_SplatCount;
     }
+   
     return o;
 }
+
 
 half4 frag (v2f i) : SV_Target
 {

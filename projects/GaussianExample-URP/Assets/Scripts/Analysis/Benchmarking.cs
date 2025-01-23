@@ -23,11 +23,11 @@ namespace Analysis
 		private FPSCalculator _fpsCalculator = new FPSCalculator();
 		private LoadingMonitor _loadingMonitor;
 
-		private IAnalysisLogger _analysisLogger = null;
+		private IPerformanceReporter _analysisLogger = null;
 		private ITimeService _timeService = null;
 		private void Awake()
 		{
-			_analysisLogger = DependencyService.GetService<IAnalysisLogger>();
+			_analysisLogger = DependencyService.GetService<IPerformanceReporter>();
 			_timeService = DependencyService.GetService<ITimeService>();
 			_loadingMonitor = new LoadingMonitor(_analysisLogger);
 			DontDestroyOnLoad(this);

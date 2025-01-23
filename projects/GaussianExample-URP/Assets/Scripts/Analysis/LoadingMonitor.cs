@@ -9,9 +9,9 @@ namespace Analysis
 	{
 		private List<LoadEvent> _activeOperations = new List<LoadEvent>(4);
 
-		private readonly IAnalysisLogger _reporter;
+		private readonly IPerformanceReporter _reporter;
 
-		public LoadingMonitor(IAnalysisLogger reporter)
+		public LoadingMonitor(IPerformanceReporter reporter)
 		{
 			_reporter = reporter;
 		}

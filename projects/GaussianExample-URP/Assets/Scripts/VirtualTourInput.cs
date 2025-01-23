@@ -61,7 +61,6 @@ public class VirtualTourInput : MonoBehaviour
 		}
 
 		_rayCaster.Update();
-
 		if (_indicatorModel.Mode == IndicatorModel.DecalMode.Available && Input.GetMouseButtonDown(0))
 		{
 			StartMove();

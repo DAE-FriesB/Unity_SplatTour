@@ -16,9 +16,9 @@ public class DependencyBuilder : MonoBehaviour
 	{
 		DependencyService.Clear();
 #if UNITY_EDITOR
-		DependencyService.RegisterService<IAnalysisLogger>(() =>
+		DependencyService.RegisterService<IPerformanceReporter>(() =>
 		{
-			return new EditorAnalysisLogger(_logEditorFPS, _logEditorLoading);
+			return new EdiorPerformanceReporter(_logEditorFPS, _logEditorLoading);
 		});
 #else
 
@@ -29,7 +29,7 @@ public class DependencyBuilder : MonoBehaviour
 #endif
 
 		DependencyService.RegisterService<ITimeService>(() => {
-			return _benchmarking ? new BenchmarkDeltaTimeProvider() : new DefaultDeltaTimeProvider();
+			return _benchmarking ? new BenchmarkTimeService() : new DefaultTimeService();
 		});
 	}
 }

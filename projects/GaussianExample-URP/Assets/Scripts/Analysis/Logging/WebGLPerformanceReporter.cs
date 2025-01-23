@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Analysis.Logging
 {
-	public class WebGLAnalysisLogger : IAnalysisLogger
+	public class WebGLPerformanceReporter : IPerformanceReporter
 	{
 		[DllImport("__Internal")]
 		private static extern void EngineLoaded();
@@ -17,7 +17,7 @@ namespace Analysis.Logging
 		[DllImport("__Internal")]
 		private static extern void FinishedLoadEvent(string loadDataName, int timestampLow, int timestampHigh, int durationMS);
 
-		public WebGLAnalysisLogger()
+		public WebGLPerformanceReporter()
 		{
 			EngineLoaded();
 		}

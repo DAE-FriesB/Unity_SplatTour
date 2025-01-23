@@ -4,12 +4,12 @@ using UnityEngine;
 
 namespace Analysis.Logging
 {
-	public class EditorAnalysisLogger : IAnalysisLogger
+	public class EdiorPerformanceReporter : IPerformanceReporter
 	{
 		private readonly bool _logFPS;
 		private readonly bool _logLoading;
 
-		public EditorAnalysisLogger(bool logFPS, bool logLoading)
+		public EdiorPerformanceReporter(bool logFPS, bool logLoading)
         {
 			_logFPS = logFPS;
 			_logLoading = logLoading;

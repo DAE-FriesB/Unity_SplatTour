@@ -1,6 +1,6 @@
 ﻿namespace Analysis.Logging
 {
-	public interface IAnalysisLogger
+	public interface IPerformanceReporter
 	{
 		void ReportLoadEventStarted(string loadDataName, long timestamp);
 		void ReportLoadEventFinished(string loadDataName, long timestamp, int durationMS);

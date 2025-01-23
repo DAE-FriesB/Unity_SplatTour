@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Timing
 {
-	public class DefaultDeltaTimeProvider : ITimeService
+	public class DefaultTimeService : ITimeService
 	{
 		public float DeltaTime => Time.deltaTime;
 

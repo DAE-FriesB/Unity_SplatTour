@@ -2,7 +2,7 @@
 
 namespace Timing
 {
-	public class BenchmarkDeltaTimeProvider : ITimeService
+	public class BenchmarkTimeService : ITimeService
 	{
 		private const int _defaultFramerate = 20;
 		private const float _defaultDeltaTime = 1f / _defaultFramerate;

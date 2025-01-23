@@ -2,6 +2,8 @@ using Analysis.Logging;
 using Dependencies;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using Timing;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -22,10 +24,11 @@ namespace Analysis
 		private LoadingMonitor _loadingMonitor;
 
 		private IAnalysisLogger _analysisLogger = null;
-
+		private ITimeService _timeService = null;
 		private void Awake()
 		{
 			_analysisLogger = DependencyService.GetService<IAnalysisLogger>();
+			_timeService = DependencyService.GetService<ITimeService>();
 			_loadingMonitor = new LoadingMonitor(_analysisLogger);
 			DontDestroyOnLoad(this);
 
@@ -122,14 +125,14 @@ namespace Analysis
 		{
 			if (delay > 0f)
 			{
-				yield return new WaitForSeconds(delay);
+				yield return _timeService.WaitForSeconds(delay) ;
 			}
 			LoadScene(sceneIndex);
 		}
 
 		IEnumerator WaitThenStop(float delay)
 		{
-			yield return new WaitForSeconds(delay);
+			yield return _timeService.WaitForSeconds(delay);
 			_analysisLogger.ReportCompleted();
 			this.enabled = false;
 

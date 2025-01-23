@@ -1,4 +1,6 @@
+using Dependencies;
 using System.Collections;
+using Timing;
 using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
@@ -32,10 +34,11 @@ public class VirtualTourInput : MonoBehaviour
 	public VirtualTourRaycaster _rayCaster { get; set; }
 	public CameraRotationInput _cameraRotationInput { get; set; }
 
-
+	private ITimeService _timeService;
 
 	private void Awake()
 	{
+		_timeService = DependencyService.GetService<ITimeService>();
 		_camera = GetComponent<Camera>();
 		_cameraRotationInput = new CameraRotationInput(_camera);
 	}
@@ -86,16 +89,16 @@ public class VirtualTourInput : MonoBehaviour
 
 			if (stopDist * stopDist < distSq)
 			{
-				_speed += Time.deltaTime * _moveAcceleration;
+				_speed += _timeService.DeltaTime * _moveAcceleration;
 			}
 			else
 			{
-				_speed -= Time.deltaTime * _moveAcceleration;
+				_speed -= _timeService.DeltaTime * _moveAcceleration;
 
 			}
 			_speed = Mathf.Clamp(_speed, 0f, _maxMoveSpeed);
 
-			transform.position = Vector3.MoveTowards(transform.position, targetPos, _speed * Time.deltaTime);
+			transform.position = Vector3.MoveTowards(transform.position, targetPos, _speed * _timeService.DeltaTime);
 
 
 			yield return null;

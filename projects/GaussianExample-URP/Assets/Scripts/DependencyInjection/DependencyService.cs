@@ -5,6 +5,28 @@ namespace Dependencies
 {
 	public static class DependencyService
 	{
+		private static Dictionary<Type, DependencySingleton> _dependencyMappings = new Dictionary<Type, DependencySingleton>();
+		
+		public static void Clear()
+		{
+			_dependencyMappings.Clear();
+		}
+		public static void RegisterService<T>(Func<T> createFunc)
+		{
+			Type type = typeof(T);
+			if (_dependencyMappings.ContainsKey(type)) return;
+			_dependencyMappings.Add(typeof(T), new DependencySingleton<T>(createFunc));
+		}
+		public static T GetService<T>()
+		{
+			if (!_dependencyMappings.TryGetValue(typeof(T), out DependencySingleton dependency))
+			{
+				throw new NotImplementedException($"No services registered with type {typeof(T)}");
+			}
+			return (dependency as DependencySingleton<T>).DependencyInstance;
+		}
+
+
 		private class DependencySingleton<T> : DependencySingleton
 		{
 			private T _instance;
@@ -30,27 +52,6 @@ namespace Dependencies
 		private abstract class DependencySingleton
 		{
 
-		}
-
-		private static Dictionary<Type, DependencySingleton> _dependencyMappings = new Dictionary<Type, DependencySingleton>();
-		
-		public static void Clear()
-		{
-			_dependencyMappings.Clear();
-		}
-		public static void RegisterService<T>(Func<T> createFunc)
-		{
-			Type type = typeof(T);
-			if (_dependencyMappings.ContainsKey(type)) return;
-			_dependencyMappings.Add(typeof(T), new DependencySingleton<T>(createFunc));
-		}
-		public static T GetService<T>()
-		{
-			if (!_dependencyMappings.TryGetValue(typeof(T), out DependencySingleton dependency))
-			{
-				throw new NotImplementedException($"No services registered with type {typeof(T)}");
-			}
-			return (dependency as DependencySingleton<T>).DependencyInstance;
 		}
 	}
 }

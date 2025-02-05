@@ -1,13 +1,16 @@
+using Dependencies;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Timing;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class AutoPlaySystem : MonoBehaviour
 {
+		
 	public event EventHandler FinishedPlaying;
 
 	[SerializeField]
@@ -28,12 +31,15 @@ public class AutoPlaySystem : MonoBehaviour
 
 	private AutoPlayRaycaster _raycaster;
 	private AutoPlayRotationInput _rotationInput;
+	private ITimeService _timeService;
 
 	private bool _animating = false;
 
 	public bool ShouldAutoPlay { get; set; }
+
 	private void Start()
 	{
+		_timeService = DependencyService.GetService<ITimeService>();
 		if (ShouldAutoPlay)
 		{
 			StartAutoPlay();
@@ -105,12 +111,11 @@ public class AutoPlaySystem : MonoBehaviour
 	{
 
 		_animating = true;
-		yield return new WaitForSeconds(_startMoveDelay);
 
 		float distSq = (checkpoint - _raycaster.MouseTarget).sqrMagnitude;
 		while (distSq > 0.01f)
 		{
-			_raycaster.MouseTarget = Vector3.MoveTowards(_raycaster.MouseTarget, checkpoint, Time.deltaTime * _maxMoveSpeed);
+			_raycaster.MouseTarget = Vector3.MoveTowards(_raycaster.MouseTarget, checkpoint, _timeService.DeltaTime * _maxMoveSpeed);
 			distSq = (checkpoint - _raycaster.MouseTarget).sqrMagnitude;
 #if UNITY_EDITOR
 			Debug.DrawLine(_cameraPos, _raycaster.MouseTarget, Color.blue);

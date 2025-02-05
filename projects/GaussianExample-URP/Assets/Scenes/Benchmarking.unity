@@ -150,6 +150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _logEditorFPS: 1
   _logEditorLoading: 0
+  _benchmarking: 1
 --- !u!4 &53544248
 Transform:
   m_ObjectHideFlags: 0

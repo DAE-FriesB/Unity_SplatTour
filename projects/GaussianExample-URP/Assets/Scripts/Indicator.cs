@@ -1,47 +1,7 @@
+using Dependencies;
 using System.Collections;
+using Timing;
 using UnityEngine;
-
-public class IndicatorModel : ModelBase
-{
-	public enum DecalMode
-	{
-		Available,
-		Unavailable,
-		Hidden
-	}
-
-
-	private DecalMode _decalMode = DecalMode.Hidden;
-	public DecalMode Mode
-	{
-		get => _decalMode;
-		set
-		{
-			//if(_decalMode.Equals(value))
-			if (_decalMode == value)
-				return;
-			_decalMode = value;
-			OnPropertyChanged();
-		}
-	}
-
-
-	private Vector3 _position;
-	public Vector3 Position
-	{
-		get => _position;
-		set
-		{
-			//if(_position.Equals(value))
-			if (_position == value)
-				return;
-			_position = value;
-			OnPropertyChanged();
-		}
-	}
-
-
-}
 
 public class Indicator : PresenterBase<IndicatorModel>
 {
@@ -57,8 +17,10 @@ public class Indicator : PresenterBase<IndicatorModel>
 
 	private Coroutine _animCoroutine;
 
+	private ITimeService _timeService;
 	public void Awake()
 	{
+		_timeService = DependencyService.GetService<ITimeService>();
 		Model = new IndicatorModel();
 		Model.Position = transform.position;
 		_decalMaterial = new Material(_decalRenderer.sharedMaterial);
@@ -105,7 +67,7 @@ public class Indicator : PresenterBase<IndicatorModel>
 		float t = 0f;
 		while (t < 1f)
 		{
-			t += Time.deltaTime * 2f;
+			t += _timeService.DeltaTime * 2f;
 			Color c = Color.Lerp(startColor, targetColor, t);
 			_decalMaterial.color = c;
 			yield return null;

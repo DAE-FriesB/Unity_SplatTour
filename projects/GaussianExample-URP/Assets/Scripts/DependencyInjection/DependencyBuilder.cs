@@ -28,7 +28,8 @@ public class DependencyBuilder : MonoBehaviour
 		});
 #endif
 
-		DependencyService.RegisterService<ITimeService>(() => {
+		DependencyService.RegisterService<ITimeService>(() =>
+		{
 			return _benchmarking ? new BenchmarkTimeService() : new DefaultTimeService();
 		});
 	}

@@ -40,7 +40,7 @@ namespace Analysis
 
 		private void Start()
 		{
-			LoadScene(1);
+			LoadNextScene(0f);
 		}
 
 		public void LoadScene(int sceneIndex)

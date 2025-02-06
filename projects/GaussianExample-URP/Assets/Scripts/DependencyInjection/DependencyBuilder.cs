@@ -18,7 +18,7 @@ public class DependencyBuilder : MonoBehaviour
 #if UNITY_EDITOR
 		DependencyService.RegisterService<IPerformanceReporter>(() =>
 		{
-			return new EdiorPerformanceReporter(_logEditorFPS, _logEditorLoading);
+			return new EditorPerformanceReporter(_logEditorFPS, _logEditorLoading);
 		});
 #else
 

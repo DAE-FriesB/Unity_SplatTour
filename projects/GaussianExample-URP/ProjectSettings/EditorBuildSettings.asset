@@ -11,5 +11,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/GSTestScene.unity
     guid: 36934c1e75cb24745a91b0a1124a3179
+  - enabled: 1
+    path: Assets/Scenes/GSTestScene2.unity
+    guid: 680b61af0cc014948b4188c6d7786638
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

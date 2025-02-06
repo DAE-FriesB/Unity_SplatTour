@@ -3,7 +3,11 @@ using Analysis.Logging;
 using Dependencies;
 using Timing;
 using UnityEngine;
-public class DependencyBuilder : MonoBehaviour
+
+
+
+[CreateAssetMenu(menuName ="DependencyConfig")]
+public class DependencyConfig : ScriptableObject
 {
 	[SerializeField]
 	private bool _logEditorFPS, _logEditorLoading;
@@ -12,7 +16,7 @@ public class DependencyBuilder : MonoBehaviour
 	private bool _benchmarking = false;
 
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
-	void Awake()
+	public void Build()
 	{
 		DependencyService.Clear();
 #if UNITY_EDITOR

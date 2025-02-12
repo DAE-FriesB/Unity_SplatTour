@@ -13,7 +13,7 @@ public class DependencyConfig : ScriptableObject
 	private bool _logEditorFPS, _logEditorLoading;
 
 	[SerializeField]
-	private bool _benchmarking = false;
+	private bool _buildBenchmark = false, _editorBenchmark = false;
 
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	public void Build()
@@ -24,17 +24,22 @@ public class DependencyConfig : ScriptableObject
 		{
 			return new EditorPerformanceReporter(_logEditorFPS, _logEditorLoading);
 		});
+		DependencyService.RegisterService<ITimeService>(() =>
+		{
+			return _editorBenchmark ? new BenchmarkTimeService() : new DefaultTimeService();
+		});
 #else
 
-		DependencyService.RegisterService<IAnalysisLogger>(() =>
+		DependencyService.RegisterService<IPerformanceReporter>(() =>
 		{
-			return new WebGLAnalysisLogger();
+			return new WebGLPerformanceReporter();
+		});
+		DependencyService.RegisterService<ITimeService>(() =>
+		{
+			return _buildBenchmark ? new BenchmarkTimeService() : new DefaultTimeService();
 		});
 #endif
 
-		DependencyService.RegisterService<ITimeService>(() =>
-		{
-			return _benchmarking ? new BenchmarkTimeService() : new DefaultTimeService();
-		});
+
 	}
 }

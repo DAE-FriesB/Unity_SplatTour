@@ -19,7 +19,15 @@
     align-items: center;
 }
 
-#logTable {
+#deviceInfo-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+
+table {
     font-family: "Courier New", Courier, monospace;
     color: #333;
     background-color: #d3d3d3; /* Light gray background color */
@@ -30,12 +38,12 @@
     max-width: 1200px;;
 }
 
-#logTable th, #logTable td {
+table th, table td {
     border: 1px solid #ddd;
     padding: 8px;
 }
 
-#logTable th {
+table th {
     background-color: #a9a9a9; /* Darker gray background for headers */
     color: black; /* Black text for headers */
     text-align: left;

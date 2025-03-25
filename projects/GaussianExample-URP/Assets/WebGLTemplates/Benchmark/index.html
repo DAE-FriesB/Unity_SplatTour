@@ -19,14 +19,27 @@
     <div class="chart-container" style="position: relative; height:250px; width:100%">
       <canvas id="memoryChart"></canvas>
     </div>
+    <div id="deviceInfo-container" style="position: relative; width:100%">
+      <table id="deviceInfoTable" border="1" style="width:100%; text-align:left;">
+        <thead>
+          <tr>
+              <th>Property</th>
+              <th>Value</th>
+          </tr>
+      </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
     <div id="log-container" style="position: relative; width:100%">
       <table id="logTable" border="1" style="width:100%; text-align:left;">
         <thead>
           <tr>
-            <th>Event</th>
             <th>Timestamp</th>
+            <th>Event</th>
             <th>Data Name</th>
             <th>Duration (ms)</th>
+            <th>Memory Usage (MB)</th>
           </tr>
         </thead>
         <tbody>
@@ -48,6 +61,7 @@
 
         document.body.style.textAlign = "left";
       }
+      displayDeviceInfo();
       startEngineLoad();
       createUnityInstance(document.querySelector("#unity-canvas"), {
         arguments: [],

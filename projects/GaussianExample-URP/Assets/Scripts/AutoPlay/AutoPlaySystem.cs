@@ -93,16 +93,22 @@ public class AutoPlaySystem : MonoBehaviour
 		}
 		if (!_animating)
 		{
-
 			Vector3 targetPos = _checkpointsQueue.Dequeue().transform.position;
 			StartCoroutine(AnimateTowardsCheckpoint(targetPos));
 			Vector3 toTarget = targetPos - _cameraPos;
 			toTarget.y *= 0.5f;
 			_rotationInput.LookatTarget = (toTarget) * 10 + _cameraPos;
 			_timer = 0f;
-
 		}
 
+		//Kill switch
+		if (_animating && Input.GetKeyDown(KeyCode.E))
+		{
+			StopAllCoroutines();
+			_animating = false;
+			_checkpointsQueue.Clear();
+			OnFinishedPlaying();
+		}
 		_rotationInput.MaxRotSpeed = _maxRotationSpeed;
 
 	}
@@ -141,9 +147,9 @@ public class AutoPlaySystem : MonoBehaviour
 			yield return new WaitForSeconds(3f);
 			OnFinishedPlaying();
 		}
-
-
 	}
+
+
 
 	protected virtual void OnFinishedPlaying()
 	{

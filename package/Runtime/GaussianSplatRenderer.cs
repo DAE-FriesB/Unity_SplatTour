@@ -115,7 +115,7 @@ namespace GaussianSplatting.Runtime
 				if (gs.m_FrameCounter % gs.m_SortNthFrame == 0)
 				{
 					gs.SortPoints(cmb, cam, matrix);
-				
+
 				}
 				++gs.m_FrameCounter;
 
@@ -568,7 +568,12 @@ namespace GaussianSplatting.Runtime
 			m_distCalculator.CalcDistances(worldToCamMatrix*matrix, ref m_GpuSortIndices, ref m_GpuSortDistances);
 			//m_distCalculator.CalcDistances(camPosInv, camScale, ref m_GpuSortIndices, ref m_GpuSortDistances);
 			//// sort the splats
+
+#if SORT_NONE
+#elif SORT_CPU
+
 			m_Sorter.Sort(ref m_GpuSortDistances, ref m_GpuSortIndices);
+#endif
 			//m_Sorter.Dispatch(cmd, m_SorterArgs);
 			//cmd.EndSample(s_ProfSort);
 

@@ -2,6 +2,7 @@ var loadTimes = [];
 var frameTimes = [];
 var avgFpsTimes= [];
 var memorySnapshots = [];
+var deviceInfo = {};
 
 var currentFrameIdx = 0;
 
@@ -12,6 +13,8 @@ var startLoadTimeStamp = 0;
 var runningTime = 0;
 var maxFrameCount = 0;
 const FRAME_STEP = 50;
+
+
 
 function convertTimeStamp(unixTimeStampMS){
     let date = new Date(Number(unixTimeStampMS));
@@ -38,6 +41,42 @@ function registerEngineLoaded(){
 }
 
 function benchmarkCompleted(){
+    
+    // Combine all captured data into a single object
+    const benchmarkData = {
+        loadTimes: loadTimes,
+        frameTimes: frameTimes,
+        avgFpsTimes: avgFpsTimes,
+        memorySnapshots: memorySnapshots,
+        deviceInfo: deviceInfo
+    };
+
+    // Convert the object to a JSON string
+    const jsonData = JSON.stringify(benchmarkData,  (_, v) =>
+        typeof v === "bigint" ? v.toString() : v, 2);
+    
+    // Create a Blob from the JSON string
+    const blob = new Blob([jsonData], { type: 'application/json' });
+
+    // Create a link element
+    const link = document.createElement('a');
+
+    // Set the download attribute with a filename
+    link.download = 'benchmark.json';
+
+    // Create a URL for the Blob and set it as the href attribute
+    link.href = URL.createObjectURL(blob);
+
+    // Append the link to the document
+    document.body.appendChild(link);
+
+    // Programmatically click the link to trigger the download
+    link.click();
+
+    // Remove the link from the document
+    document.body.removeChild(link);
+
+    // Alert the user that the benchmark is complete
     alert('Benchmark complete!');
 }
 
@@ -53,28 +92,42 @@ function registerEndLoadEvent(dataName, timeStamp, durationMS)
 
     //memory snapshot
     let timeSinceLoad = calcTimeSinceLoad(timeStamp);
-    takeMemorySnapshot(timeStamp, timeSinceLoad/1000.0);
+    let memoryUsage = takeMemorySnapshot(timeStamp, timeSinceLoad/1000.0);
 
-    addLoadingRow("Finished Loading", timeStamp, dataName, durationMS);
+    addLoadingRow("Finished", timeStamp, dataName,memoryUsage, durationMS);
 }
 function registerStartLoadEvent(dataName, timeStamp)
 {
     logEvent(timeStamp, `Started loading ${dataName}`);
-    addLoadingRow("Started Loading", timeStamp, dataName, 0);
+
+    let timeSinceLoad = calcTimeSinceLoad(timeStamp);
+    let memoryUsage = takeMemorySnapshot(timeStamp, timeSinceLoad/1000.0);
+
+    addLoadingRow("Started", timeStamp, dataName, memoryUsage);
 }
-function addLoadingRow(event, timeStamp, dataName, durationMS){
+function addLoadingRow(event, timeStamp, dataName, memoryUsage, durationMS ){
 
     const logTable = document.getElementById('logTable').getElementsByTagName('tbody')[0];
     const newRow = logTable.insertRow();
-    const eventCell = newRow.insertCell(0);
-    const timestampCell = newRow.insertCell(1);
+    const timestampCell = newRow.insertCell(0);
+    const eventCell = newRow.insertCell(1);
     const dataNameCell = newRow.insertCell(2);
     const durationCell = newRow.insertCell(3);
-
+    const memoryUsageCell = newRow.insertCell(4);
+    
     eventCell.textContent = event;
     timestampCell.textContent = convertTimeStamp(timeStamp);
     dataNameCell.textContent = dataName;
-    durationCell.textContent = durationMS;
+    memoryUsageCell.textContent = memoryUsage !== undefined ? memoryUsage : '';
+
+    if(durationMS !== undefined)
+    {
+        durationCell.textContent = durationMS;
+    }
+    else
+    {
+        durationCell.textContent = '';
+    }
 }
 
 
@@ -264,6 +317,66 @@ var takeMemorySnapshot = function(timestamp, timeSinceLoad){
             memoryChart.data.labels.push(convertTimeStamp(timestamp));
             memoryChart.data.datasets[0].data.push(memoryData);
             memoryChart.update('none');
+        }
+    }
+    return megaBytesUsed;
+}
+
+//retrieve information about the GPU
+function getDeviceInfo()
+{
+    const deviceInfo = {};
+
+    // Get the user agent string
+    deviceInfo.userAgent = navigator.userAgent;
+
+    // Get the platform
+    deviceInfo.platform = navigator.userAgentData.platform;
+
+    // Get the screen resolution
+    deviceInfo.screenResolution = {
+        width: window.screen.width,
+        height: window.screen.height
+    };
+
+    // Get GPU information
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (gl) {
+        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+        if (debugInfo) {
+            deviceInfo.gpuVendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+            deviceInfo.gpuRenderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+        } else {
+            deviceInfo.gpuVendor = 'Unknown';
+            deviceInfo.gpuRenderer = 'Unknown';
+        }
+    } else {
+        deviceInfo.gpuVendor = 'WebGL not supported';
+        deviceInfo.gpuRenderer = 'WebGL not supported';
+    }
+
+    //TODO: Get unity graphics info: SystemInfo GraphicsDeviceID, GraphicsDeviceVendorID
+
+    return deviceInfo;
+}
+
+function displayDeviceInfo() {
+    const info = getDeviceInfo();
+    const tableBody = document.getElementById('deviceInfoTable').getElementsByTagName('tbody')[0];
+    deviceInfo = info;
+    for (const key in info) {
+        if (info.hasOwnProperty(key)) {
+            const row = document.createElement('tr');
+            const cellKey = document.createElement('td');
+            const cellValue = document.createElement('td');
+
+            cellKey.textContent = key;
+            cellValue.textContent = typeof info[key] === 'object' ? JSON.stringify(info[key]) : info[key];
+
+            row.appendChild(cellKey);
+            row.appendChild(cellValue);
+            tableBody.appendChild(row);
         }
     }
 }

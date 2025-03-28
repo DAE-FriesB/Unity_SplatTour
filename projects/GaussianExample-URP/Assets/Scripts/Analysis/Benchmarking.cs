@@ -27,6 +27,7 @@ namespace Analysis
 		private ITimeService _timeService = null;
 		private void Awake()
 		{
+			Debug.Log("Benchmarking Awake");
 			_analysisLogger = DependencyService.GetService<IPerformanceReporter>();
 			_timeService = DependencyService.GetService<ITimeService>();
 			_loadingMonitor = new LoadingMonitor(_analysisLogger);
@@ -40,6 +41,7 @@ namespace Analysis
 
 		private void Start()
 		{
+			Debug.Log("Benchmarking Start");
 			LoadNextScene(0f);
 		}
 
@@ -127,6 +129,7 @@ namespace Analysis
 			{
 				yield return _timeService.WaitForSeconds(delay) ;
 			}
+			Debug.Log("Loading scene " + sceneIndex);
 			LoadScene(sceneIndex);
 		}
 

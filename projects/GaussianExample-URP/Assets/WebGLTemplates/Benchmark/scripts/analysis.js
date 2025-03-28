@@ -1,6 +1,7 @@
 var loadTimes = [];
 var frameTimes = [];
 var avgFpsTimes= [];
+var frameCounts = {};
 var memorySnapshots = [];
 var deviceInfo = {};
 
@@ -12,48 +13,68 @@ var combinedChart = null;
 var startLoadTimeStamp = 0;
 var runningTime = 0;
 var maxFrameCount = 0;
-const FRAME_STEP = 50;
+const FRAME_STEP = 100;
 
-
+var currentFramePrefix = "S-1";
 
 function convertTimeStamp(unixTimeStampMS){
     let date = new Date(Number(unixTimeStampMS));
     //date = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
     return date.toLocaleTimeString('en-US', { hour12: false }) + '.' + String(date.getMilliseconds()).padStart(3, '0');
 }
-function calcTimeSinceLoad(unixTimeStampMS){
-    if(typeof unixTimeStampMS === 'bigint'){
-        return Number(unixTimeStampMS - BigInt(startLoadTimeStamp));
+function calcTimeSinceLoad(unixTimeStampMS)
+{
+    if(typeof(unixTimeStampMS) === 'bigint')
+    {
+        return Number( unixTimeStampMS - BigInt(startLoadTimeStamp));
     }
-    return unixTimeStampMS - startLoadTimeStamp;
+   return unixTimeStampMS - startLoadTimeStamp;
 }
 
 //gets called right before the application is loaded.
-function startEngineLoad(){
+function startEngineLoad()
+{
     startLoadTimeStamp = Date.now();
     registerStartLoadEvent("Engine", startLoadTimeStamp);
+
+    currentFramePrefix = "S00";
+    frameCounts[currentFramePrefix] = 0;
 }
 //gets called from the application, right after the application has started.
-function registerEngineLoaded(){
+function registerEngineLoaded(gpuInfo){
     endLoadTimeStamp = Date.now();
-    loadTimes.push(endLoadTimeStamp - startLoadTimeStamp);
+    displayDeviceInfo(gpuInfo);
     registerEndLoadEvent("Engine", endLoadTimeStamp, endLoadTimeStamp - startLoadTimeStamp);
+}
+function getConfig()
+{
+    let url = window.location.pathname;
+    // Remove trailing slash if it exists
+    if (url.endsWith('/')) {
+        url = url.slice(0, -1);
+    }
+    // Split the URL by '/' and get the last part
+    const parts = url.split('/');
+    let urlPart = parts[parts.length - 1];
+    let config = { route: urlPart };
+    return config;
 }
 
 function benchmarkCompleted(){
     
     // Combine all captured data into a single object
     const benchmarkData = {
+        config: getConfig(),
+        deviceInfo: deviceInfo,
+        memorySnapshots: memorySnapshots,
         loadTimes: loadTimes,
+        frameCounts: frameCounts,
         frameTimes: frameTimes,
         avgFpsTimes: avgFpsTimes,
-        memorySnapshots: memorySnapshots,
-        deviceInfo: deviceInfo
     };
 
     // Convert the object to a JSON string
-    const jsonData = JSON.stringify(benchmarkData,  (_, v) =>
-        typeof v === "bigint" ? v.toString() : v, 2);
+    const jsonData = JSON.stringify(benchmarkData,null, 2);
     
     // Create a Blob from the JSON string
     const blob = new Blob([jsonData], { type: 'application/json' });
@@ -80,28 +101,44 @@ function benchmarkCompleted(){
     alert('Benchmark complete!');
 }
 
+//called from jslib
 function registerEndLoadEvent(dataName, timeStamp, durationMS)
 {
+    timeStamp = Date.now();
+    let timeSinceLoad = calcTimeSinceLoad(timeStamp);
     let data = {};
     data.name = dataName;
-    data.timeStamp = timeStamp;
+    data.timeSinceLoad = timeSinceLoad;
+    //data.timeStamp = timeStamp;
     data.durationMS = durationMS;
     loadTimes.push(data);
 
-    logEvent(timeStamp, `Finished loading ${dataName} in ${durationMS}ms`);
+    if(dataName === 'LoadScene_Scene_1')
+    {
+        currentFramePrefix = "S01";
+        frameCounts[currentFramePrefix] = 0;
+    }
+    else if(dataName === 'LoadScene_Scene_2')
+    {
+        currentFramePrefix = "S02";
+        frameCounts[currentFramePrefix] = 0;
+    }
 
-    //memory snapshot
-    let timeSinceLoad = calcTimeSinceLoad(timeStamp);
-    let memoryUsage = takeMemorySnapshot(timeStamp, timeSinceLoad/1000.0);
+
+    logEvent(timeStamp, `Finished loading ${dataName} in ${durationMS}ms`);
+    takeMemorySnapshot(timeStamp, timeSinceLoad/1000.0, "Load_End_" + dataName);
+    let memoryUsage = takeMemorySnapshot(timeStamp, timeSinceLoad/1000.0, getFrameIdString(currentFramePrefix, 0));
 
     addLoadingRow("Finished", timeStamp, dataName,memoryUsage, durationMS);
 }
+//called from jslib
 function registerStartLoadEvent(dataName, timeStamp)
 {
+    timeStamp = Date.now();
     logEvent(timeStamp, `Started loading ${dataName}`);
 
     let timeSinceLoad = calcTimeSinceLoad(timeStamp);
-    let memoryUsage = takeMemorySnapshot(timeStamp, timeSinceLoad/1000.0);
+    let memoryUsage = takeMemorySnapshot(timeStamp, timeSinceLoad/1000.0, "Load_Start_" + dataName);
 
     addLoadingRow("Started", timeStamp, dataName, memoryUsage);
 }
@@ -145,19 +182,21 @@ function updateFPSCounter(averageFPS) {
     }
 
 }
-
+function getFrameIdString(prefix, frameCount){
+    return prefix + "_" + String(frameCount).padStart(3, '0');
+}
 function registerFrameTime(frameTimeMS)
 {
     runningTime += frameTimeMS/1000;
 
+    frameCounts[currentFramePrefix]++;
     frameTimes.push(frameTimeMS);
     avgFpsTimes.push(currentFps);
     ++currentFrameIdx;
 
-    if(currentFrameIdx % FRAME_STEP === 0){
-        takeMemorySnapshot();
+    if( frameCounts[currentFramePrefix] % FRAME_STEP === 0){
+        takeMemorySnapshot(undefined,undefined, getFrameIdString(currentFramePrefix, frameCounts[currentFramePrefix]));
     }
-
 
     updateFPSCharts();
 }
@@ -293,10 +332,10 @@ var initMemoryChart = function(){
             }
         }
     });
-    takeMemorySnapshot(Date.now(),0);
+    //takeMemorySnapshot(Date.now(),0, "Start");
 };
 
-var takeMemorySnapshot = function(timestamp, timeSinceLoad){
+var takeMemorySnapshot = function(timestamp, timeSinceLoad, reason){
 
     if(timestamp === undefined)
     {
@@ -305,7 +344,7 @@ var takeMemorySnapshot = function(timestamp, timeSinceLoad){
     }
 
     const megaBytesUsed = fetchMemoryInfo();
-    memorySnapshots.push({timestamp: timestamp, memoryInfo: megaBytesUsed});
+    memorySnapshots.push({timestamp: timestamp, memoryInfo: megaBytesUsed,  reason: reason});
     if(megaBytesUsed > 0)
     {
         const memoryData = {
@@ -340,29 +379,32 @@ function getDeviceInfo()
     };
 
     // Get GPU information
-    const canvas = document.createElement('canvas');
-    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-    if (gl) {
-        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-        if (debugInfo) {
-            deviceInfo.gpuVendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
-            deviceInfo.gpuRenderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-        } else {
-            deviceInfo.gpuVendor = 'Unknown';
-            deviceInfo.gpuRenderer = 'Unknown';
-        }
-    } else {
-        deviceInfo.gpuVendor = 'WebGL not supported';
-        deviceInfo.gpuRenderer = 'WebGL not supported';
-    }
+    // const canvas = document.querySelector('#unity-canvas');
+    // const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    // if (gl) {
+    //     const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+    //     if (debugInfo) {
+    //         deviceInfo.gpuVendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+    //         deviceInfo.gpuRenderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+    //     } else {
+    //         deviceInfo.gpuVendor = 'Unknown';
+    //         deviceInfo.gpuRenderer = 'Unknown';
+    //     }
+    // } else {
+    //     deviceInfo.gpuVendor = 'WebGL not supported';
+    //     deviceInfo.gpuRenderer = 'WebGL not supported';
+    // }
 
-    //TODO: Get unity graphics info: SystemInfo GraphicsDeviceID, GraphicsDeviceVendorID
-
+    console.log(deviceInfo);    
     return deviceInfo;
 }
 
-function displayDeviceInfo() {
+function displayDeviceInfo(gpuInfo) {
     const info = getDeviceInfo();
+    for(let key in gpuInfo)
+    {
+        info[key] = gpuInfo[key];
+    }
     const tableBody = document.getElementById('deviceInfoTable').getElementsByTagName('tbody')[0];
     deviceInfo = info;
     for (const key in info) {

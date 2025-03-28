@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="styles/style.css">
   </head>
   <body style="text-align: center; padding: 0; border: 0; margin: 0;">
+    <div id="prebenchmarkview" style="display: block;">
+      <button onclick="startBenchmark()">Start Benchmark</button>
+    </div>
+    <div id="benchmarkview" style="display: none;">
     <canvas id="unity-canvas" width={{{ WIDTH }}} height={{{ HEIGHT }}} tabindex="-1" style="width: {{{ WIDTH }}}px; height: {{{ HEIGHT }}}px; background: {{{ BACKGROUND_FILENAME ? 'url(\'Build/' + BACKGROUND_FILENAME.replace(/'/g, '%27') + '\') center / cover' : BACKGROUND_COLOR }}}"></canvas>
     <div id="fpsCounter">0 FPS</div>
     <script src="scripts/chart.js"></script>
@@ -46,6 +50,7 @@
         </tbody>
       </table>
       </div>
+    </div>
       <script>
          if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         // Mobile device style: fill the whole browser client area with the game canvas:
@@ -61,29 +66,33 @@
 
         document.body.style.textAlign = "left";
       }
-      displayDeviceInfo();
-      startEngineLoad();
-      createUnityInstance(document.querySelector("#unity-canvas"), {
-        arguments: [],
-        dataUrl: "Build/{{{ DATA_FILENAME }}}",
-        frameworkUrl: "Build/{{{ FRAMEWORK_FILENAME }}}",
-#if USE_THREADS
-        workerUrl: "Build/{{{ WORKER_FILENAME }}}",
-#endif
-#if USE_WASM
-        codeUrl: "Build/{{{ CODE_FILENAME }}}",
-#endif
-#if SYMBOLS_FILENAME
-        symbolsUrl: "Build/{{{ SYMBOLS_FILENAME }}}",
-#endif
-        streamingAssetsUrl: "StreamingAssets",
-        companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
-        productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
-        productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
-        // matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
-        // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
-      });
-        initFPSCharts();
+      function startBenchmark(){
+        document.querySelector("#benchmarkview").style.display = "block";
+        document.querySelector("#prebenchmarkview").style.display = "none";
+        //displayDeviceInfo();
+        startEngineLoad();
+        createUnityInstance(document.querySelector("#unity-canvas"), {
+          arguments: [],
+          dataUrl: "Build/{{{ DATA_FILENAME }}}",
+          frameworkUrl: "Build/{{{ FRAMEWORK_FILENAME }}}",
+  #if USE_THREADS
+          workerUrl: "Build/{{{ WORKER_FILENAME }}}",
+  #endif
+  #if USE_WASM
+          codeUrl: "Build/{{{ CODE_FILENAME }}}",
+  #endif
+  #if SYMBOLS_FILENAME
+          symbolsUrl: "Build/{{{ SYMBOLS_FILENAME }}}",
+  #endif
+          streamingAssetsUrl: "StreamingAssets",
+          companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+          productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+          productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+          // matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
+          // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
+        });
+          initFPSCharts();
+      }
       </script>
   </body>
 </html>

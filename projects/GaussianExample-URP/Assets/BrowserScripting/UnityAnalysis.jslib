@@ -1,10 +1,21 @@
 mergeInto(LibraryManager.library, {
 
-  EngineLoaded: function()
+  EngineLoaded: function(gpuNameStr, gpuId, gpuVendorStr, gpuVersionStr, gpuVendorId)
   {
+    const gpuName = UTF8ToString(gpuNameStr);
+    const gpuVersion = UTF8ToString(gpuVersionStr);
+    const gpuVendor = UTF8ToString(gpuVendorStr);
+    var gpuInfo = {
+      name: gpuName,
+      Id: gpuId,
+      vendor: gpuVendor,
+      vendorId: gpuVendorId,
+      version: gpuVersion
+    };
     if(typeof registerEngineLoaded === 'function')
     {
-      registerEngineLoaded();
+      registerEngineLoaded(gpuInfo);
+      //registerEngineLoaded();
     }
   },
 
@@ -24,9 +35,10 @@ mergeInto(LibraryManager.library, {
   {
       if(typeof registerStartLoadEvent === 'function')
       {
-        let dataName = UTF8ToString(dataNameStr);
-        let timeStampBigInt = BigInt(timeStampLow) | (BigInt(timestampHigh) << BigInt(32));
-        registerStartLoadEvent(dataName, timeStampBigInt);
+        const dataName = UTF8ToString(dataNameStr);
+        // Convert the original number to its binary representation
+
+        registerStartLoadEvent(dataName, 0);
       }
   },
 
@@ -35,8 +47,8 @@ mergeInto(LibraryManager.library, {
     if(typeof registerEndLoadEvent === 'function')
     {
       let dataName = UTF8ToString(dataNameStr);
-      let timeStampBigInt = BigInt(timeStampLow) | (BigInt(timestampHigh) << BigInt(32));
-      registerEndLoadEvent(dataName,timeStampBigInt, durationMS);
+
+      registerEndLoadEvent(dataName,0, durationMS);
     }
   },
 

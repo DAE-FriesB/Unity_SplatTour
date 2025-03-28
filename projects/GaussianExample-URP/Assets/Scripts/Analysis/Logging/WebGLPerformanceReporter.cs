@@ -1,12 +1,13 @@
 ﻿using System.Runtime.InteropServices;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Analysis.Logging
 {
 	public class WebGLPerformanceReporter : IPerformanceReporter
 	{
 		[DllImport("__Internal")]
-		private static extern void EngineLoaded();
+		private static extern void EngineLoaded(string gpuName, int gpuId, string gpuVendor, string gpuVersion, int gpuVendorId);
 		[DllImport("__Internal")]
 		private static extern void BenchmarkComplete();
 
@@ -19,7 +20,14 @@ namespace Analysis.Logging
 
 		public WebGLPerformanceReporter()
 		{
-			EngineLoaded();
+			Debug.Log("Getting GPU info");
+			var name = SystemInfo.graphicsDeviceName;
+			var gpuId = SystemInfo.graphicsDeviceID;
+			var vendor = SystemInfo.graphicsDeviceVendor;
+			var vendorId = SystemInfo.graphicsDeviceVendorID;
+			var version = SystemInfo.graphicsDeviceVersion;
+
+			EngineLoaded(name, gpuId, vendor, version, vendorId);
 		}
 
 		public void ReportFPS(float currentFrameTime, float averageFPS)

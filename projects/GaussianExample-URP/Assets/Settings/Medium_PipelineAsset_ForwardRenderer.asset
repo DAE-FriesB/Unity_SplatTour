@@ -13,6 +13,19 @@ MonoBehaviour:
   m_Name: GaussianSplatURPFeature
   m_EditorClassIdentifier: 
   m_Active: 1
+--- !u!114 &-4761179701397542380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60b135a71004d784cb5540a9ceb37456, type: 3}
+  m_Name: GaussianSplatURPFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -38,8 +51,8 @@ MonoBehaviour:
     probeSamplingDebugTexture: {fileID: 0}
     probeVolumeBlendStatesCS: {fileID: 0}
   m_RendererFeatures:
-  - {fileID: -6851802070553482712}
-  m_RendererFeatureMap: 28aa5fb95182e9a0
+  - {fileID: -4761179701397542380}
+  m_RendererFeatureMap: 142a669249e4ecbd
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}

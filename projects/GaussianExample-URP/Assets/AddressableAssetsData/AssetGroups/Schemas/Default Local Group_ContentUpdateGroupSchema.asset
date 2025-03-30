@@ -9,10 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0758c50550394a46bdb97f651f7aa8a, type: 3}
-  m_Name: DependencyConfig
+  m_Script: {fileID: 11500000, guid: 5834b5087d578d24c926ce20cd31e6d6, type: 3}
+  m_Name: Default Local Group_ContentUpdateGroupSchema
   m_EditorClassIdentifier: 
-  _logEditorFPS: 0
-  _logEditorLoading: 1
-  _buildBenchmark: 1
-  _editorBenchmark: 0
+  m_Group: {fileID: 11400000, guid: e734dbf6732852d489f0dfe5e5507a8e, type: 2}
+  m_StaticContent: 0

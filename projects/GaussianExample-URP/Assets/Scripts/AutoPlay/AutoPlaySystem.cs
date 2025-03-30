@@ -24,6 +24,9 @@ public class AutoPlaySystem : MonoBehaviour
 	[SerializeField]
 	private float _startMoveDelay = 3f;
 
+	[SerializeField]
+	private SplatLoader _splatLoader;
+
 	private bool _playing = false;
 	private float _timer = 0f;
 
@@ -31,11 +34,13 @@ public class AutoPlaySystem : MonoBehaviour
 
 	private AutoPlayRaycaster _raycaster;
 	private AutoPlayRotationInput _rotationInput;
+	
 	private ITimeService _timeService;
 
 	private bool _animating = false;
 
 	public bool ShouldAutoPlay { get; set; }
+
 
 	private void Start()
 	{
@@ -86,11 +91,11 @@ public class AutoPlaySystem : MonoBehaviour
 	private void Update()
 	{
 		if (!_playing) return;
-
 		if (!_checkpointsQueue.Any())
 		{
 			return;
 		}
+		if (!_splatLoader.IsLoaded) return;
 		if (!_animating)
 		{
 			Vector3 targetPos = _checkpointsQueue.Dequeue().transform.position;

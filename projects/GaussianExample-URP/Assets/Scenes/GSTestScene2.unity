@@ -5864,6 +5864,7 @@ MonoBehaviour:
   _maxMoveSpeed: 5
   _maxRotationSpeed: 60
   _startMoveDelay: 1
+  _splatLoader: {fileID: 1609192437}
 --- !u!1 &1223240181
 GameObject:
   m_ObjectHideFlags: 0
@@ -8013,6 +8014,7 @@ GameObject:
   - component: {fileID: 1609192435}
   - component: {fileID: 1609192434}
   - component: {fileID: 1609192436}
+  - component: {fileID: 1609192437}
   m_Layer: 0
   m_Name: GaussianSplats
   m_TagString: Untagged
@@ -8027,25 +8029,25 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1609192433}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c12d929a7f62c48adbe9ff45c9a33ff0, type: 3}
+  m_Script: {fileID: 11500000, guid: d87dccf4773b45a408d6d44097b22c08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Asset: {fileID: 11400000, guid: 21087670b1460ed4999be9e03f467971, type: 2}
+  m_Asset: {fileID: 0}
   m_SplatScale: 1
   m_OpacityScale: 1
   m_SHOrder: 3
   m_SHOnly: 0
   m_SortNthFrame: 1
   m_RenderMode: 0
-  m_PointDisplaySize: 8.06
+  m_PointDisplaySize: 3
   m_Cutouts: []
-  m_ShaderSplats: {fileID: 4800000, guid: ed800126ae8844a67aad1974ddddd59c, type: 3}
-  m_ShaderComposite: {fileID: 4800000, guid: 7e184af7d01193a408eb916d8acafff9, type: 3}
-  m_ShaderDebugPoints: {fileID: 4800000, guid: b44409fc67214394f8f47e4e2648425e, type: 3}
-  m_ShaderDebugBoxes: {fileID: 4800000, guid: 4006f2680fd7c8b4cbcb881454c782be, type: 3}
-  m_CSSplatUtilities: {fileID: 7200000, guid: ec84f78b836bd4f96a105d6b804f08bd, type: 3}
+  m_ShaderSplats: {fileID: 4800000, guid: b495db98880678848b5ec869378f3299, type: 3}
+  m_ShaderComposite: {fileID: 4800000, guid: 5afaf1c1235cc6a42a829e87bb675345, type: 3}
+  m_ShaderDebugPoints: {fileID: 4800000, guid: 1098e8aa81e2b8f44848fe38cfd2b7f8, type: 3}
+  m_ShaderDebugBoxes: {fileID: 4800000, guid: 1098e8aa81e2b8f44848fe38cfd2b7f8, type: 3}
+  m_CSSplatUtilities: {fileID: 7200000, guid: 4be127f1d99b86040a54c04e14faaca9, type: 3}
 --- !u!4 &1609192435
 Transform:
   m_ObjectHideFlags: 0
@@ -8071,16 +8073,36 @@ MonoBehaviour:
   m_GameObject: {fileID: 1609192433}
   m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7cc47c5bf6363942a15b17c7459df14, type: 3}
+  m_Script: {fileID: 11500000, guid: c5ed09810abd5d249a5fa49232ab958d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _anchors:
-  - IsSet: 1
-    Position: {x: -16.198017, y: 0, z: 1.3997754}
-  - IsSet: 1
-    Position: {x: -25.369297, y: 0, z: 11.345166}
-  - IsSet: 1
-    Position: {x: -28.252886, y: -0.00000047683716, z: 2.513556}
+  - IsSet: 0
+    Position: {x: 0, y: 0, z: 0}
+  - IsSet: 0
+    Position: {x: 0, y: 0, z: 0}
+  - IsSet: 0
+    Position: {x: 0, y: 0, z: 0}
+--- !u!114 &1609192437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1609192433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f81f118a8d24064681c6cb6b1738e76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mainSplatName: Alameda
+  _splatAsset:
+    m_AssetGUID: 21087670b1460ed4999be9e03f467971
+    m_SubObjectName: 
+    m_SubObjectGUID: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  _renderer: {fileID: 1609192434}
 --- !u!1 &1650727574
 GameObject:
   m_ObjectHideFlags: 0

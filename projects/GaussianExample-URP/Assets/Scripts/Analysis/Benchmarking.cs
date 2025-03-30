@@ -25,12 +25,13 @@ namespace Analysis
 
 		private IPerformanceReporter _analysisLogger = null;
 		private ITimeService _timeService = null;
+
 		private void Awake()
 		{
 			Debug.Log("Benchmarking Awake");
 			_analysisLogger = DependencyService.GetService<IPerformanceReporter>();
 			_timeService = DependencyService.GetService<ITimeService>();
-			_loadingMonitor = new LoadingMonitor(_analysisLogger);
+			_loadingMonitor = LoadingMonitor.Instance;
 			DontDestroyOnLoad(this);
 
 			foreach(int index in _sceneIndices)
@@ -78,6 +79,7 @@ namespace Analysis
 				autoPlay.FinishedPlaying += AutoPlay_FinishedPlaying;
 				autoPlay.ShouldAutoPlay = true;
 			}
+
 		}
 
 		private void AutoPlay_FinishedPlaying(object sender, System.EventArgs e)

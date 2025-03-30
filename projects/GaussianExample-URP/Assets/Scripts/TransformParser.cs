@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using Newtonsoft.Json;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;

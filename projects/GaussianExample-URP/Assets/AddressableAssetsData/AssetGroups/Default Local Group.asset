@@ -14,7 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_GroupName: Default Local Group
   m_GUID: 02e28b59de000884ea3df84359fdc90f
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: 1e7db70a15863974d855273d30c7ef1b
+    m_Address: Assets/GaussianAssets/nyc_splat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 75d5932bbefdaef49a885ceb3c2c0753, type: 2}
   m_SchemaSet:

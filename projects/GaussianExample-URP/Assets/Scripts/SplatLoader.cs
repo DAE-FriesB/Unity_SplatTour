@@ -17,7 +17,11 @@ public class SplatLoader : MonoBehaviour
 	[SerializeField]
 	private GaussianSplatRenderer _renderer;
 
+	[SerializeField]
+	private GaussianSplatAsset[] _splatAssets;
+
 	public bool IsLoaded { get; private set; }
+	private SplatSplitter _splitter;
 
 #if UNITY_EDITOR
 	private void OnValidate()
@@ -33,13 +37,14 @@ public class SplatLoader : MonoBehaviour
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	public void Awake()
 	{
+		_splitter = GetComponent<SplatSplitter>();
+		//TODO: start with loading the main asset (from splitter: mainChunkIdx)
 		var operation = _splatAsset.LoadAssetAsync();
 		//var analysisLogger = DependencyService.GetService<IPerformanceReporter>();
 		var loadingMonitor = LoadingMonitor.Instance;
 
 		//scene loading operation
 		var sceneLoadEvent = loadingMonitor.FindActiveOperation((ev) => ev.EventType == LoadEvent.LoadEventType.LoadScene );
-
 		var splatLoadEvent = loadingMonitor.MonitorAsyncOperation(operation, LoadEvent.LoadEventType.LoadSplat, _mainSplatName);
 
 		if(sceneLoadEvent != null)
@@ -47,9 +52,28 @@ public class SplatLoader : MonoBehaviour
 			sceneLoadEvent.ChildLoadingEvent = splatLoadEvent;
 		}
 
-
 		operation.Completed += SplatLoader_Completed;
 		
+	}
+
+	private void Start()
+	{
+		LoadAdditionalSplats();
+	}
+
+	void LoadAdditionalSplats()
+	{
+		
+		for (int idx = 0; idx < _splatAssets.Length; idx++)
+		{
+			GaussianSplatAsset asset = _splatAssets[idx];
+			if (asset == _splatAsset.Asset) continue;
+			//TODO: Load splatasset from addressables
+
+			//Instantiate prefab in splitter
+			_splitter.SplatLoaded(idx, asset);
+		
+		}
 	}
 
 	private void SplatLoader_Completed(AsyncOperationHandle<GaussianSplatAsset> obj)

@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e5d17a21594effb4e9591490b009e7aa, type: 3}
-  m_Name: NYC_BundledAssetGroupSchema
+  m_Name: NYC_P01_BundledAssetGroupSchema
   m_EditorClassIdentifier: 
-  m_Group: {fileID: 11400000, guid: 57678665b28e6e348912c39e7aa92c5b, type: 2}
+  m_Group: {fileID: 11400000, guid: a0c2bb5c15aac9e4b88d6032a46d2272, type: 2}
   m_InternalBundleIdMode: 1
   m_Compression: 1
   m_IncludeAddressInCatalog: 1

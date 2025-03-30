@@ -52,6 +52,10 @@ namespace GaussianSplatting.Editor
 		int m_PrevVertexCount;
 		long m_PrevFileSize;
 
+		private readonly SplitConfig _splitConfig = new SplitConfig();
+
+		bool _toggleSplitSettings = true;
+
 		bool isUsingChunks => m_FormatPos != GaussianSplatAsset.VectorFormat.Float32 ||
 		  m_FormatScale != GaussianSplatAsset.VectorFormat.Float32 ||
 		  m_FormatColor != GaussianSplatAsset.ColorFormat.Float32x4 ||
@@ -79,6 +83,7 @@ namespace GaussianSplatting.Editor
 
 		void OnGUI()
 		{
+			_splitConfig.AutoDetectSplitterInScene();
 			EditorGUILayout.Space();
 			GUILayout.Label("Input data", EditorStyles.boldLabel);
 			var rect = EditorGUILayout.GetControlRect(true);
@@ -159,6 +164,12 @@ namespace GaussianSplatting.Editor
 			else
 				GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
+			EditorGUILayout.Space();
+
+			//Splitting settings
+			_toggleSplitSettings = EditorGUILayout.BeginToggleGroup("Splat Splitting", _toggleSplitSettings);
+			_splitConfig.DrawEditorGUI(_toggleSplitSettings);
+			EditorGUILayout.EndToggleGroup();
 
 			EditorGUILayout.Space();
 			GUILayout.BeginHorizontal();
@@ -263,90 +274,110 @@ namespace GaussianSplatting.Editor
 
 			EditorUtility.DisplayProgressBar(kProgressTitle, "Reading data files", 0.0f);
 			GaussianSplatAsset.CameraInfo[] cameras = LoadJsonCamerasFile(m_InputFile, m_ImportCameras);
-			using NativeArray<InputSplatData> inputSplats = LoadPLYSplatFile(m_InputFile);
+			NativeArray<InputSplatData> inputSplatsAll = LoadPLYSplatFile(m_InputFile);
 
-			if (inputSplats.Length == 0)
+
+			if (inputSplatsAll.Length == 0)
 			{
 				EditorUtility.ClearProgressBar();
+				inputSplatsAll.Dispose();
 				return;
 			}
+			Dictionary<int, NativeArray<InputSplatData>> partitionedSplatData = _splitConfig.CalculatePartitions(inputSplatsAll);
 
-			float3 boundsMin, boundsMax;
-			var boundsJob = new CalcBoundsJob
+			foreach (var partitionKvp in partitionedSplatData)
 			{
-				m_BoundsMin = &boundsMin,
-				m_BoundsMax = &boundsMax,
-				m_SplatData = inputSplats
-			};
-			boundsJob.Schedule().Complete();
 
-			EditorUtility.DisplayProgressBar(kProgressTitle, "Morton reordering", 0.05f);
+				int partitionIdx = partitionKvp.Key;
+				var inputSplats = partitionKvp.Value;
+				string partitionSuffix = partitionIdx == -1 ? "Default" : $"P{partitionIdx:D2}";
+
+				float3 boundsMin, boundsMax;
+				var boundsJob = new CalcBoundsJob
+				{
+					m_BoundsMin = &boundsMin,
+					m_BoundsMax = &boundsMax,
+					m_SplatData = inputSplats
+				};
+				boundsJob.Schedule().Complete();
+
+				EditorUtility.DisplayProgressBar(kProgressTitle, $"{partitionSuffix} - Morton reordering", 0.05f);
 
 
-			ReorderMorton(inputSplats, boundsMin, boundsMax);
+				ReorderMorton(inputSplats, boundsMin, boundsMax);
 
 
-			var positions = inputSplats.Take(15).Select(p => p.pos).ToArray();
+				var positions = inputSplats.Take(15).Select(p => p.pos).ToArray();
 
 
 
-			// cluster SHs
-			NativeArray<int> splatSHIndices = default;
-			NativeArray<GaussianSplatAsset.SHTableItemFloat16> clusteredSHs = default;
-			if (m_FormatSH >= GaussianSplatAsset.SHFormat.Cluster64k)
-			{
-				EditorUtility.DisplayProgressBar(kProgressTitle, "Cluster SHs", 0.2f);
-				ClusterSHs(inputSplats, m_FormatSH, out clusteredSHs, out splatSHIndices);
+				// cluster SHs
+				NativeArray<int> splatSHIndices = default;
+				NativeArray<GaussianSplatAsset.SHTableItemFloat16> clusteredSHs = default;
+				if (m_FormatSH >= GaussianSplatAsset.SHFormat.Cluster64k)
+				{
+					EditorUtility.DisplayProgressBar(kProgressTitle, $"{partitionSuffix} - Cluster SHs", 0.2f);
+					ClusterSHs(inputSplats, m_FormatSH, out clusteredSHs, out splatSHIndices);
+				}
+				string originalName = Path.GetFileNameWithoutExtension(FilePickerControl.PathToDisplayString(m_InputFile));
+				string baseName = originalName + $"_{partitionSuffix}";
+
+				EditorUtility.DisplayProgressBar(kProgressTitle, $"{partitionSuffix} - Creating data objects", 0.7f);
+				GaussianSplatAsset asset = ScriptableObject.CreateInstance<GaussianSplatAsset>();
+				asset.Initialize(inputSplats.Length, m_FormatPos, m_FormatScale, m_FormatColor, m_FormatSH, boundsMin, boundsMax, cameras);
+				asset.name = baseName;
+
+				if (!AssetDatabase.GetSubFolders(m_OutputFolder).Any(p => p.EndsWith(originalName)))
+				{
+					AssetDatabase.CreateFolder(m_OutputFolder, originalName);
+				}
+
+				var dataHash = new Hash128((uint)asset.splatCount, (uint)asset.formatVersion, 0, 0);
+				string pathChunk = $"{m_OutputFolder}/{originalName}/{baseName}_chk.bytes";
+				string pathPos = $"{m_OutputFolder}/{originalName}/{baseName}_pos.bytes";
+				string pathOther = $"{m_OutputFolder}/{originalName}/{baseName}_oth.bytes";
+				string pathCol = $"{m_OutputFolder}/{originalName}/{baseName}_col.bytes";
+				string pathSh = $"{m_OutputFolder}/{originalName}/{baseName}_shs.bytes";
+				LinearizeData(inputSplats);
+				positions = inputSplats.Take(15).Select(p => p.pos).ToArray();
+				// if we are using full lossless (FP32) data, then do not use any chunking, and keep data as-is
+				bool useChunks = isUsingChunks;
+				if (useChunks)
+					CreateChunkData(inputSplats, pathChunk, ref dataHash);
+				CreatePositionsData(inputSplats, pathPos, ref dataHash);
+				CreateOtherData(inputSplats, pathOther, ref dataHash, splatSHIndices);
+				CreateColorData(inputSplats, pathCol, ref dataHash);
+				CreateSHData(inputSplats, pathSh, ref dataHash, clusteredSHs);
+				asset.SetDataHash(dataHash);
+
+				splatSHIndices.Dispose();
+				clusteredSHs.Dispose();
+
+				// files are created, import them so we can get to the imported objects, ugh
+				EditorUtility.DisplayProgressBar(kProgressTitle, $"{partitionSuffix} - Initial texture import", 0.85f);
+				AssetDatabase.Refresh(ImportAssetOptions.ForceUncompressedImport);
+
+				EditorUtility.DisplayProgressBar(kProgressTitle, $"{partitionSuffix} - Setup data onto asset", 0.95f);
+				asset.SetAssetFiles(
+					useChunks ? AssetDatabase.LoadAssetAtPath<TextAsset>(pathChunk) : null,
+					AssetDatabase.LoadAssetAtPath<TextAsset>(pathPos),
+					AssetDatabase.LoadAssetAtPath<TextAsset>(pathOther),
+					AssetDatabase.LoadAssetAtPath<TextAsset>(pathCol),
+					AssetDatabase.LoadAssetAtPath<TextAsset>(pathSh));
+
+				var assetPath = $"{m_OutputFolder}/{originalName}/{baseName}.asset";
+				var savedAsset = CreateOrReplaceAsset(asset, assetPath);
+
+				EditorUtility.DisplayProgressBar(kProgressTitle, $"{partitionSuffix} - Saving assets", 0.99f);
+				AssetDatabase.SaveAssets();
+				EditorUtility.ClearProgressBar();
+				Selection.activeObject = savedAsset;
+
+				_splitConfig.CreateAddressables(baseName, asset);
+
+				inputSplats.Dispose();
 			}
 
-			string baseName = Path.GetFileNameWithoutExtension(FilePickerControl.PathToDisplayString(m_InputFile));
-
-			EditorUtility.DisplayProgressBar(kProgressTitle, "Creating data objects", 0.7f);
-			GaussianSplatAsset asset = ScriptableObject.CreateInstance<GaussianSplatAsset>();
-			asset.Initialize(inputSplats.Length, m_FormatPos, m_FormatScale, m_FormatColor, m_FormatSH, boundsMin, boundsMax, cameras);
-			asset.name = baseName;
-
-			var dataHash = new Hash128((uint)asset.splatCount, (uint)asset.formatVersion, 0, 0);
-			string pathChunk = $"{m_OutputFolder}/{baseName}_chk.bytes";
-			string pathPos = $"{m_OutputFolder}/{baseName}_pos.bytes";
-			string pathOther = $"{m_OutputFolder}/{baseName}_oth.bytes";
-			string pathCol = $"{m_OutputFolder}/{baseName}_col.bytes";
-			string pathSh = $"{m_OutputFolder}/{baseName}_shs.bytes";
-			LinearizeData(inputSplats);
-			positions = inputSplats.Take(15).Select(p => p.pos).ToArray();
-			// if we are using full lossless (FP32) data, then do not use any chunking, and keep data as-is
-			bool useChunks = isUsingChunks;
-			if (useChunks)
-				CreateChunkData(inputSplats, pathChunk, ref dataHash);
-			CreatePositionsData(inputSplats, pathPos, ref dataHash);
-			CreateOtherData(inputSplats, pathOther, ref dataHash, splatSHIndices);
-			CreateColorData(inputSplats, pathCol, ref dataHash);
-			CreateSHData(inputSplats, pathSh, ref dataHash, clusteredSHs);
-			asset.SetDataHash(dataHash);
-
-			splatSHIndices.Dispose();
-			clusteredSHs.Dispose();
-
-			// files are created, import them so we can get to the imported objects, ugh
-			EditorUtility.DisplayProgressBar(kProgressTitle, "Initial texture import", 0.85f);
-			AssetDatabase.Refresh(ImportAssetOptions.ForceUncompressedImport);
-
-			EditorUtility.DisplayProgressBar(kProgressTitle, "Setup data onto asset", 0.95f);
-			asset.SetAssetFiles(
-				useChunks ? AssetDatabase.LoadAssetAtPath<TextAsset>(pathChunk) : null,
-				AssetDatabase.LoadAssetAtPath<TextAsset>(pathPos),
-				AssetDatabase.LoadAssetAtPath<TextAsset>(pathOther),
-				AssetDatabase.LoadAssetAtPath<TextAsset>(pathCol),
-				AssetDatabase.LoadAssetAtPath<TextAsset>(pathSh));
-
-			var assetPath = $"{m_OutputFolder}/{baseName}.asset";
-			var savedAsset = CreateOrReplaceAsset(asset, assetPath);
-
-			EditorUtility.DisplayProgressBar(kProgressTitle, "Saving assets", 0.99f);
-			AssetDatabase.SaveAssets();
-			EditorUtility.ClearProgressBar();
-
-			Selection.activeObject = savedAsset;
 		}
 
 		unsafe NativeArray<InputSplatData> LoadPLYSplatFile(string plyPath)

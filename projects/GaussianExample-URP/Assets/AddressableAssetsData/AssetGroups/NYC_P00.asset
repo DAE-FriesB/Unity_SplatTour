@@ -10,38 +10,33 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: NYC
+  m_Name: NYC_P00
   m_EditorClassIdentifier: 
-  m_GroupName: NYC
-  m_GUID: 644a3b8cd8056f848aa540f7702df799
+  m_GroupName: NYC_P00
+  m_GUID: baedd9aca5452e9428a0e616df811ba5
   m_SerializeEntries:
-  - m_GUID: 1c26f7755747c8a4eb9eba1fd693fc08
-    m_Address: Assets/GaussianAssets/nyc_splat_col.bytes
+  - m_GUID: 183e3061490ea4742bf7552166154448
+    m_Address: Assets/GaussianAssets/nyc_splat/nyc_splat_P00.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 33126e1d25a646444a977711f92a98d7
-    m_Address: Assets/GaussianAssets/nyc_splat_shs.bytes
+  - m_GUID: 1d905bacfd00ac14e8cf978ff539c52f
+    m_Address: Assets/GaussianAssets/nyc_splat/nyc_splat_P00_col.bytes
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 44ecd01eec18c9a4fbbfc6f68b376e98
-    m_Address: Assets/GaussianAssets/nyc_splat_oth.bytes
+  - m_GUID: 4c1ac7ca078db5c4cb7f901fac004a90
+    m_Address: Assets/GaussianAssets/nyc_splat/nyc_splat_P00_pos.bytes
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 58df839494ef9df489dd9dcd0ebf8b8b
-    m_Address: Assets/GaussianAssets/nyc_splat_chk.bytes
+  - m_GUID: 60f6c78351afe9b47be6b50501a5fb4f
+    m_Address: Assets/GaussianAssets/nyc_splat/nyc_splat_P00_oth.bytes
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 9712587eebd90d146b4a1c3978430eb3
-    m_Address: Assets/GaussianAssets/nyc_splat.asset
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: ac44112dae5502c4895d2b8c4d921b55
-    m_Address: Assets/GaussianAssets/nyc_splat_pos.bytes
+  - m_GUID: b8c3bea6af7eeb644926b952d0eaeaef
+    m_Address: Assets/GaussianAssets/nyc_splat/nyc_splat_P00_shs.bytes
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -49,5 +44,5 @@ MonoBehaviour:
   m_Settings: {fileID: 11400000, guid: 75d5932bbefdaef49a885ceb3c2c0753, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: 29699fcdd08a40848995a607cde3b4e6, type: 2}
-    - {fileID: 11400000, guid: 744d708ddffbb0a46b99b34f515d17c0, type: 2}
+    - {fileID: 11400000, guid: 749c4018d518c37428869d5f3e11b40b, type: 2}
+    - {fileID: 11400000, guid: 8410e3c9666d26b4cad4c1393f3d560a, type: 2}

@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using static UnityEngine.Rendering.HDROutputUtils;
 
 namespace Analysis
 {

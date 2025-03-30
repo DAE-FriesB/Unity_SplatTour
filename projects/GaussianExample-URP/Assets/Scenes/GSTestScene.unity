@@ -5910,6 +5910,7 @@ GameObject:
   - component: {fileID: 1609192434}
   - component: {fileID: 1609192436}
   - component: {fileID: 1609192437}
+  - component: {fileID: 1609192438}
   m_Layer: 0
   m_Name: GaussianSplats
   m_TagString: Untagged
@@ -5929,7 +5930,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d87dccf4773b45a408d6d44097b22c08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Asset: {fileID: 0}
+  m_Asset: {fileID: 11400000, guid: acd27fab4534dfb4e9d2ce60172c2443, type: 2}
   m_SplatScale: 1
   m_OpacityScale: 1.05
   m_SHOrder: 0
@@ -5992,12 +5993,43 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mainSplatName: nyc
   _splatAsset:
-    m_AssetGUID: 9712587eebd90d146b4a1c3978430eb3
+    m_AssetGUID: acd27fab4534dfb4e9d2ce60172c2443
     m_SubObjectName: 
     m_SubObjectGUID: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
   _renderer: {fileID: 1609192434}
+  _splatAssets:
+  - {fileID: 11400000, guid: 183e3061490ea4742bf7552166154448, type: 2}
+  - {fileID: 11400000, guid: 9fde5156744fef94796f7e1160dbea2b, type: 2}
+  - {fileID: 11400000, guid: 872384acf7228a7449d4738908bc5c57, type: 2}
+  - {fileID: 11400000, guid: ec17aff6bc9fbb5478e5ab706dd6e1a1, type: 2}
+  - {fileID: 11400000, guid: 6d3bb3ce29cb8b345939b9faf29399f7, type: 2}
+  - {fileID: 11400000, guid: 79dceea04a1b489408ac7d5d8df9c096, type: 2}
+  - {fileID: 11400000, guid: dcc69cd77fc5f654c9b2e985b89676cc, type: 2}
+  - {fileID: 11400000, guid: 82158fbe5812aaf4497f3c5d7f418df8, type: 2}
+  - {fileID: 11400000, guid: 21453176b5350114cad3324856be47c9, type: 2}
+  - {fileID: 11400000, guid: dbaf914a6cb864f48938e89274206527, type: 2}
+  - {fileID: 11400000, guid: 1145555bbc595214280c13a45daaf927, type: 2}
+  - {fileID: 11400000, guid: a194054b255e5944c9aa2b11db561354, type: 2}
+--- !u!114 &1609192438
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1609192433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa10d52129ee37243b1b76c688c7e461, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PartitionSize: {x: 5.61, y: 5.76}
+  CenterOffset: {x: -1.53, y: 0}
+  NumRows: 4
+  NumColumns: 3
+  MainChunkIndex: 7
+  _splatPartitionPrefab: {fileID: 897796349755534670, guid: f87002cb09812ba478010448a9e3cebc, type: 3}
 --- !u!1 &1616556168
 GameObject:
   m_ObjectHideFlags: 0

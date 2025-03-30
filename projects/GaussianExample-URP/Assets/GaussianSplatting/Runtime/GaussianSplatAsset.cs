@@ -127,6 +127,7 @@ namespace GaussianSplatting.Runtime
             m_SHData = dataSh;
         }
 
+ 
         public static int GetOtherSizeNoSHIndex(VectorFormat scaleFormat)
         {
             return 4 + GetVectorSize(scaleFormat);

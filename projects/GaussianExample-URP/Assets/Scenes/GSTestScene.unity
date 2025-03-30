@@ -5931,8 +5931,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Asset: {fileID: 0}
   m_SplatScale: 1
-  m_OpacityScale: 1
-  m_SHOrder: 3
+  m_OpacityScale: 1.05
+  m_SHOrder: 0
   m_SHOnly: 0
   m_SortNthFrame: 1
   m_RenderMode: 0

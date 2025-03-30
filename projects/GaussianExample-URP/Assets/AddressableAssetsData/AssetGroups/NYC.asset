@@ -30,6 +30,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 58df839494ef9df489dd9dcd0ebf8b8b
+    m_Address: Assets/GaussianAssets/nyc_splat_chk.bytes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9712587eebd90d146b4a1c3978430eb3
     m_Address: Assets/GaussianAssets/nyc_splat.asset
     m_ReadOnly: 0

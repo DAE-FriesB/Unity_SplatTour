@@ -30,6 +30,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c1d7bc51fd2e0464684268685cf27c09
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat_chk.bytes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e2b6d21e1e80b344ebca7c80bed6615f
     m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat_shs.bytes
     m_ReadOnly: 0

@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: 02e28b59de000884ea3df84359fdc90f
   m_currentHash:
     serializedVersion: 2
-    Hash: c69ae4a7d44c6058ceb0e66f01f4dd18
+    Hash: 00000000000000000000000000000000
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 1
   m_CatalogRequestsTimeout: 0
@@ -34,6 +34,8 @@ MonoBehaviour:
   m_EnableJsonCatalog: 0
   m_NonRecursiveBuilding: 1
   m_CCDEnabled: 0
+  m_CcdLogRequests: 0
+  m_CcdLogRequestHeaders: 0
   m_maxConcurrentWebRequests: 3
   m_UseUWRForLocalBundles: 0
   m_BundleTimeout: 0
@@ -48,6 +50,7 @@ MonoBehaviour:
   mBuiltInBundleCustomNaming: 
   m_MonoScriptBundleNaming: 0
   m_CheckForContentUpdateRestrictionsOption: 0
+  m_BuildAndReleaseBinFileOption: 0
   m_MonoScriptBundleCustomNaming: 
   m_RemoteCatalogBuildPath:
     m_Id: 14d132252284ed94ea8a5ce559189479
@@ -72,11 +75,13 @@ MonoBehaviour:
       m_ProfileName: Default
       m_Values:
       - m_Id: 14d132252284ed94ea8a5ce559189479
-        m_Value: 'ServerData/[BuildTarget]'
+        m_Value: CCDBuildData/3c9ce4c1-05f4-4b3a-9322-436c1c774860/62b6535c-6803-439b-a6d7-610a9ffd5c4b/latest
       - m_Id: 1a8a4f457e206c54c9a5bb3a035bf7de
         m_Value: '[UnityEditor.EditorUserBuildSettings.activeBuildTarget]'
       - m_Id: 50f07d5c851b6c14aafa0be1719856ad
         m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
+      - m_Id: 55e88614fc1d5394c911b908f31f292e
+        m_Value: production
       - m_Id: eccfcb3900ebf9246ac508489544f120
         m_Value: '{UnityEngine.AddressableAssets.Addressables.RuntimePath}/[BuildTarget]'
       - m_Id: ecd59763ccb46514c86d9a3f9ed5276d
@@ -90,6 +95,9 @@ MonoBehaviour:
       m_InlineUsage: 0
     - m_Id: 50f07d5c851b6c14aafa0be1719856ad
       m_Name: Local.BuildPath
+      m_InlineUsage: 0
+    - m_Id: 55e88614fc1d5394c911b908f31f292e
+      m_Name: EnvironmentName
       m_InlineUsage: 0
     - m_Id: eccfcb3900ebf9246ac508489544f120
       m_Name: Local.LoadPath
@@ -114,3 +122,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8a00a4e551026004e97bafed1375f2aa, type: 2}
   - {fileID: 11400000, guid: f8868f759eca7c948bbd42a859d9d5f3, type: 2}
   m_ActiveProfileId: fc0ff21979e21d34d9f75850ef98bdbb
+  m_CcdManagedData:
+    EnvironmentId: 
+    EnvironmentName: 
+    BucketId: 
+    Badge: 
+    State: 0

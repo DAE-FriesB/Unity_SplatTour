@@ -335,12 +335,18 @@ namespace GaussianSplatting.Runtime
 			if (!HasValidAsset)
 				return;
 
+
+
 			m_SplatCount = asset.splatCount;
 			m_GpuPosData = new GraphicsBuffer(GraphicsBuffer.Target.Raw | GraphicsBuffer.Target.CopySource, (int)(asset.posData.dataSize / 4), 4) { name = "GaussianPosData" };
 
+			NativeArray<GaussianSplatAsset.ChunkInfo>? chunkData = asset.chunkData == null? null : asset.chunkData.GetData<GaussianSplatAsset.ChunkInfo>();
+			
+			int numChunks = chunkData.HasValue ? (int)(asset.chunkData.dataSize / UnsafeUtility.SizeOf<GaussianSplatAsset.ChunkInfo>()) : 0;
+
 			NativeArray<uint> posData = asset.posData.GetData<uint>();
 			m_GpuPosData.SetData(posData);
-			m_distCalculator = new CPUDistanceCalculator(posData,GaussianSplatAsset.GetVectorSize(asset.posFormat),m_SplatCount);
+			m_distCalculator = new CPUDistanceCalculator(posData, chunkData, numChunks,GaussianSplatAsset.GetVectorSize(asset.posFormat),m_SplatCount);
 			
 			
 			m_GpuOtherData = new GraphicsBuffer(GraphicsBuffer.Target.Raw | GraphicsBuffer.Target.CopySource, (int)(asset.otherData.dataSize / 4), 4) { name = "GaussianOtherData" };
@@ -356,10 +362,10 @@ namespace GaussianSplatting.Runtime
 			if (asset.chunkData != null && asset.chunkData.dataSize != 0)
 			{
 				m_GpuChunks = new GraphicsBuffer(GraphicsBuffer.Target.Structured,
-					(int)(asset.chunkData.dataSize / UnsafeUtility.SizeOf<GaussianSplatAsset.ChunkInfo>()),
+					numChunks,
 					UnsafeUtility.SizeOf<GaussianSplatAsset.ChunkInfo>())
 				{ name = "GaussianChunkData" };
-				m_GpuChunks.SetData(asset.chunkData.GetData<GaussianSplatAsset.ChunkInfo>());
+				m_GpuChunks.SetData(chunkData.Value);
 				m_GpuChunksValid = true;
 			}
 			else

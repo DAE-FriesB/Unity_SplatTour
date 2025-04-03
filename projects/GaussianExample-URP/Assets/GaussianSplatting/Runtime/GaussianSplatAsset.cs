@@ -182,8 +182,9 @@ namespace GaussianSplatting.Runtime
         }
         public static long CalcColorDataSize(int splatCount, ColorFormat formatColor)
         {
-            var (width, height) = CalcTextureSize(splatCount);
-            return width * height * GetColorSize(formatColor);
+            return splatCount * GetColorSize(formatColor);
+            //var (width, height) = CalcTextureSize(splatCount);
+            //return width * height * GetColorSize(formatColor);
         }
         public static long CalcSHDataSize(int splatCount, SHFormat formatSh)
         {

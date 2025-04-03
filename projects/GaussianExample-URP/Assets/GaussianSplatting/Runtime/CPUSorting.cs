@@ -26,12 +26,12 @@ namespace GaussianSplatting.Runtime
 				indices[idx] = idx;
 			}
 		}
-		public void Sort(ref uint[] inputValues, ref uint[] inputKeys)
+		public void Sort(ref uint[] inputValues, ref uint[] inputKeys, int startIndex, int count)
 		{
 
 			for (int shiftAmount = 0; shiftAmount < 32; shiftAmount += _shiftSize)
 			{
-				CountSort(ref inputValues, ref inputKeys, shiftAmount);
+				CountSort(ref inputValues, ref inputKeys, shiftAmount, startIndex, count);
 			}
 		}
 
@@ -53,38 +53,44 @@ namespace GaussianSplatting.Runtime
 			value = (value >> shiftAmount) & _shiftMask;
 			return value;
 		}
-		private void CountSort(ref uint[] inputValues, ref uint[] inputKeys, int shiftAmt)
+		private void CountSort(ref uint[] inputValues, ref uint[] inputKeys, int shiftAmt, int startIndex, int amount)
 		{
 			for (int i = 0; i < _base; i++)
 			{
 				_countArr[i] = 0;
 			}
 
-			
-			for (int i = 0; i < _numItems; i++)
+			//Count amount values with base
+			for (int i = 0; i < amount; i++)
 			{
-
-				uint baseValue =  GetBaseValue(inputValues[i], shiftAmt);
+				int arrIndex = i + startIndex;
+				uint baseValue =  GetBaseValue(inputValues[arrIndex], shiftAmt);
 				_countArr[baseValue]++;
 			}
 
+			//PrefixSum
 			for (int i = 1; i < _base; i++)
 			{
 				_countArr[i] += _countArr[i - 1];
 			}
 
-			for (int i = (int)_numItems - 1; i >= 0; i--)
+			//Move around values
+			for (int i = (int)amount - 1; i >= 0; i--)
 			{
 				uint index = GetBaseValue(inputValues[i], shiftAmt);
-				_outputValues[_countArr[index] - 1] = inputValues[i];
-				_outputKeys[_countArr[index] - 1] = inputKeys[i];
+
+				int sourceIndex = startIndex + i;
+				int targetIndex = startIndex + (int)_countArr[index] - 1;
+				_outputValues[targetIndex] = inputValues[sourceIndex];
+				_outputKeys[targetIndex] = inputKeys[sourceIndex];
 				_countArr[index]--;
 			}
 
-			for (int i = 0; i < _numItems; i++)
+			for (int i = 0; i < amount; i++)
 			{
-				inputValues[i] = _outputValues[i];
-				inputKeys[i] = _outputKeys[i];
+				int arrIndex = startIndex + i;
+				inputValues[arrIndex] = _outputValues[arrIndex];
+				inputKeys[arrIndex] = _outputKeys[arrIndex];
 			}
 		}
 	}

@@ -24,5 +24,13 @@ namespace GaussianSplatting.Runtime
 			asset.shData != null &&
 			asset.colorData != null;
 
+		private void OnEnable()
+		{
+			GaussianSplatRenderSystem.instance.SetSplatActive(this, true);
+		}
+		private void OnDisable()
+		{
+			GaussianSplatRenderSystem.instance.SetSplatActive(this, false);
+		}
 	}
 }

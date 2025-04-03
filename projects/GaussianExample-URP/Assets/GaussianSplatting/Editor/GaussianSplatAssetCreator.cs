@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using GaussianSplatting.Editor.Utils;
 using GaussianSplatting.Runtime;
+using Newtonsoft.Json;
 using NUnit.Framework.Constraints;
 using Unity.Burst;
 using Unity.Collections;
@@ -358,7 +359,7 @@ namespace GaussianSplatting.Editor
 					CreateChunkData(inputSplats, pathChunk, ref dataHash);
 				CreatePositionsData(inputSplats, pathPos, ref dataHash);
 				CreateOtherData(inputSplats, pathOther, ref dataHash, splatSHIndices);
-				CreateColorData(inputSplats, pathCol, ref dataHash);
+				CreateColorDataBasic(inputSplats, pathCol, ref dataHash);
 				CreateSHData(inputSplats, pathSh, ref dataHash, clusteredSHs);
 				asset.SetDataHash(dataHash);
 
@@ -1003,6 +1004,20 @@ namespace GaussianSplatting.Editor
 		}
 
 		[BurstCompile]
+		struct CreateColorDataJob2 : IJobParallelFor
+		{
+			[ReadOnly] public NativeArray<InputSplatData> m_Input;
+			[NativeDisableParallelForRestriction] public NativeArray<byte> m_Output;
+
+			public unsafe void Execute(int index)
+			{
+				var splat = m_Input[index];
+				int idx = index * 16;
+				((float4*)m_Output.GetUnsafePtr())[idx] = new float4(splat.dc0.x, splat.dc0.y, splat.dc0.z, splat.opacity);
+			}
+		}
+
+		[BurstCompile]
 		struct CreateColorDataJob : IJobParallelFor
 		{
 			[ReadOnly] public NativeArray<InputSplatData> m_Input;
@@ -1015,7 +1030,22 @@ namespace GaussianSplatting.Editor
 				m_Output[i] = new float4(splat.dc0.x, splat.dc0.y, splat.dc0.z, splat.opacity);
 			}
 		}
+		
+		void CreateColorDataBasic(NativeArray<InputSplatData> inputSplats, string filePath, ref Hash128 dataHash)
+		{
+			NativeArray<byte> data = new NativeArray<byte>(inputSplats.Length * 16, Allocator.TempJob);
+			CreateColorDataJob2 simpleConvert = new CreateColorDataJob2()
+			{
+				m_Input = inputSplats,
+				m_Output = data
+			};
+			dataHash.Append(data);
+			simpleConvert.Schedule(inputSplats.Length, 8196).Complete();
+			using var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+			fs.Write(simpleConvert.m_Output);
+			simpleConvert.m_Output.Dispose();
 
+		}
 		void CreateColorData(NativeArray<InputSplatData> inputSplats, string filePath, ref Hash128 dataHash)
 		{
 			var (width, height) = GaussianSplatAsset.CalcTextureSize(inputSplats.Length);

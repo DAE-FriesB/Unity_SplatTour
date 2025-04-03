@@ -11,19 +11,12 @@ namespace GaussianSplatting.Runtime
 		private const int _max_Dist = 100;
 		private readonly Vector3[] _posData;
 
-		public CPUDistanceCalculator(Vector3[] posData, NativeArray<ChunkInfo>? chunkInfos, int numChunks, int formatSize, int count)
+		public CPUDistanceCalculator(Vector3[] posData)
 		{
-
 			_posData = posData;
-			LoadSplatPositions(posData, formatSize);
-
-			if (chunkInfos.HasValue && numChunks > 0)
-			{
-				TransformSplatsByChunk(chunkInfos.Value, numChunks);
-			}
-
 		}
-		internal void CalcDistances(Matrix4x4 viewProjMatrix, ref uint[] splatSortIndices, ref uint[] splatDistancesArr)
+
+		internal void CalcDistances(Matrix4x4 viewProjMatrix, ref uint[] splatSortIndices, ref uint[] splatDistancesArr, int numSplats)
 		{
 			Vector3 pos = Vector3.zero;
 			float maxDist = 0;
@@ -51,25 +44,30 @@ namespace GaussianSplatting.Runtime
 
 
 
-		unsafe void LoadSplatPositions(NativeArray<uint> dataArr, int formatSize, int startIdx, int endIdx)
+		public unsafe void LoadSplatPositions(NativeArray<float3> dataArr, int offsetIdx, int count, Transform partition, Transform renderer)
 		{
-
-
-			byte* inputPtr = (byte*)(dataArr.GetUnsafePtr());
 			Vector3 result = new Vector3();
 
-			for (int idx = 0; idx < _posData.Length; ++idx, inputPtr += formatSize)
+			var t2 = partition;
+			var t1 = renderer;
+			var matrix = t1.worldToLocalMatrix * t2.localToWorldMatrix;
+
+			for (int idx = 0; idx < count; ++idx)//12 = formatSize (based on Float32 for position format)
 			{
-				switch (formatSize)
-				{
-					case 4:
-						DecodeNorm11ToVec(inputPtr, ref result);
-						break;
-					default:
-						DecodeFloat32ToVec(inputPtr, ref result);
-						break;
-				}
-				_posData[idx] = result;
+				int targetidx = offsetIdx + idx;
+				//switch (formatSize)
+				//{
+				//	case 4:
+				//		DecodeNorm11ToVec(inputPtr, ref result);
+				//		break;
+				//	default:
+				result = dataArr[idx];
+				//		break;
+				//}
+
+				result = matrix.MultiplyPoint(result);
+
+				_posData[targetidx] = result;
 			}
 
 		}

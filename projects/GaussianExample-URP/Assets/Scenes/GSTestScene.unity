@@ -5930,9 +5930,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d87dccf4773b45a408d6d44097b22c08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Asset: {fileID: 0}
   m_SplatScale: 1
-  m_OpacityScale: 1.05
+  m_OpacityScale: 1
   m_SHOrder: 0
   m_SHOnly: 0
   m_SortNthFrame: 1
@@ -5992,14 +5991,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _defaultSplatAsset:
-    ShouldLoad: 1
-    Name: nyc_splat_Default
+    ShouldLoad: 0
+    Name: nyc_splat_P07
     Asset:
-      m_AssetGUID: acd27fab4534dfb4e9d2ce60172c2443
+      m_AssetGUID: 82158fbe5812aaf4497f3c5d7f418df8
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
+    NumSplats: 131498
+    ColorFormat: 0
   _splatAssets:
   - ShouldLoad: 0
     Name: nyc_splat_P00
@@ -6009,6 +6010,8 @@ MonoBehaviour:
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
+    NumSplats: 203
+    ColorFormat: 0
   - ShouldLoad: 0
     Name: nyc_splat_P01
     Asset:
@@ -6017,6 +6020,8 @@ MonoBehaviour:
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
+    NumSplats: 49821
+    ColorFormat: 0
   - ShouldLoad: 0
     Name: nyc_splat_P02
     Asset:
@@ -6025,6 +6030,8 @@ MonoBehaviour:
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
+    NumSplats: 83976
+    ColorFormat: 0
   - ShouldLoad: 0
     Name: nyc_splat_P03
     Asset:
@@ -6033,6 +6040,8 @@ MonoBehaviour:
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
+    NumSplats: 870
+    ColorFormat: 0
   - ShouldLoad: 0
     Name: nyc_splat_P04
     Asset:
@@ -6041,6 +6050,8 @@ MonoBehaviour:
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
+    NumSplats: 99476
+    ColorFormat: 0
   - ShouldLoad: 0
     Name: nyc_splat_P05
     Asset:
@@ -6049,6 +6060,8 @@ MonoBehaviour:
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
+    NumSplats: 83808
+    ColorFormat: 0
   - ShouldLoad: 0
     Name: nyc_splat_P06
     Asset:
@@ -6057,6 +6070,8 @@ MonoBehaviour:
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
+    NumSplats: 30156
+    ColorFormat: 0
   - ShouldLoad: 1
     Name: nyc_splat_P07
     Asset:
@@ -6065,6 +6080,8 @@ MonoBehaviour:
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
+    NumSplats: 131498
+    ColorFormat: 0
   - ShouldLoad: 0
     Name: nyc_splat_P08
     Asset:
@@ -6073,6 +6090,8 @@ MonoBehaviour:
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
+    NumSplats: 79547
+    ColorFormat: 0
   - ShouldLoad: 0
     Name: nyc_splat_P09
     Asset:
@@ -6081,6 +6100,8 @@ MonoBehaviour:
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
+    NumSplats: 32233
+    ColorFormat: 0
   - ShouldLoad: 0
     Name: nyc_splat_P10
     Asset:
@@ -6089,6 +6110,8 @@ MonoBehaviour:
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
+    NumSplats: 53658
+    ColorFormat: 0
   - ShouldLoad: 0
     Name: nyc_splat_P11
     Asset:
@@ -6097,6 +6120,8 @@ MonoBehaviour:
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
+    NumSplats: 37471
+    ColorFormat: 0
 --- !u!114 &1609192438
 MonoBehaviour:
   m_ObjectHideFlags: 0

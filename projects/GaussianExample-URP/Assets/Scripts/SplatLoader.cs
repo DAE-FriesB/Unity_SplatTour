@@ -24,7 +24,6 @@ public class SplatAssetInfo
 
 	public int NumSplats;
 	public GaussianSplatAsset.ColorFormat ColorFormat;
-	public  
 
 	public SplatPartition Partition { get; set; }
 }
@@ -46,6 +45,7 @@ public class SplatLoader : MonoBehaviour
 		if (_defaultSplatAsset?.Asset?.editorAsset != null)
 		{
 			_defaultSplatAsset.Name = _defaultSplatAsset.Asset.editorAsset.name;
+			_defaultSplatAsset.NumSplats = _defaultSplatAsset.Asset.editorAsset.splatCount;
 		}
 
 		if (_splatAssets.Any())
@@ -56,6 +56,7 @@ public class SplatLoader : MonoBehaviour
 				if (splatAsset?.Asset?.editorAsset == null) continue;
 				splatAsset.Name = splatAsset.Asset.editorAsset.name;
 				splatAsset.NumSplats = splatAsset.Asset.editorAsset.splatCount;
+				splatAsset.ColorFormat = splatAsset.Asset.editorAsset.colorFormat;
 			}
 		}
 	}
@@ -67,14 +68,17 @@ public class SplatLoader : MonoBehaviour
 
 		int mainPartitionIndex = _splitter.MainChunkIndex;
 
-		_defaultSplatAsset.Partition = _splitter.CreatePartition(-1);
+		CreatePartitionForSplatAsset(-1, _defaultSplatAsset);
+	
 		//Prepare splat partitions
 		for(int idx = 0; idx < _splatAssets.Length; ++idx)
 		{
-			SplatPartition p = _splitter.CreatePartition(idx);
-			_splatAssets[idx].Partition = p;
+			var splatAsset = _splatAssets[idx];
+			CreatePartitionForSplatAsset(idx, splatAsset);
+
 		}
 
+		_splitter.InitializeRenderer();
 		//scene loading operation
 		var loadingMonitor = LoadingMonitor.Instance;
 
@@ -86,6 +90,17 @@ public class SplatLoader : MonoBehaviour
 		//}
 	}
 
+	private void CreatePartitionForSplatAsset(int partitionIdx, SplatAssetInfo splatAsset)
+	{
+		SplatPartition p = _splitter.CreatePartition(partitionIdx);
+		p.SplatCount = splatAsset.NumSplats;
+		splatAsset.Partition = p;
+	}
+
+	void CreatePartitionForSplatAsset()
+	{
+
+	}
 
 
 	LoadEvent LoadSplat(SplatAssetInfo splatAssetInfo, int partitionIndex)
@@ -106,27 +121,27 @@ public class SplatLoader : MonoBehaviour
 
 	private void Update()
 	{
-		if (Input.GetKeyDown(KeyCode.Space))
-		{
-			LoadAdditionalSplats(false);
-		}
+		//if (Input.GetKeyDown(KeyCode.Space))
+		//{
+		//	LoadAdditionalSplats(false);
+		//}
 	}
 
 	private void Start()
 	{
-		LoadAdditionalSplats(true);
+		LoadSplat(_splatAssets[7], 7);
 	}
 
-	void LoadAdditionalSplats(bool mainOnly = false)
-	{
-		LoadSplat(_defaultSplatAsset, -1);
-		if (mainOnly) return;
-		for (int idx = 0; idx < _splatAssets.Length; idx++)
-		{
-			SplatAssetInfo asset = _splatAssets[idx];
-			LoadSplat(asset, idx);
-		}
-	}
+	//void LoadAdditionalSplats(bool mainOnly = false)
+	//{
+	//	LoadSplat(_defaultSplatAsset, -1);
+	//	if (mainOnly) return;
+	//	for (int idx = 0; idx < _splatAssets.Length; idx++)
+	//	{
+	//		SplatAssetInfo asset = _splatAssets[idx];
+	//		LoadSplat(asset, idx);
+	//	}
+	//}
 
 
 

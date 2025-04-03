@@ -20,12 +20,15 @@ namespace GaussianSplatting.Runtime
 		private const float _boundsHeight = 50f;
 
 		private GaussianSplatRenderer _defaultRenderer;
-		private Dictionary<int,SplatPartition> _partitions;
+		private Dictionary<int, SplatPartition> _partitions;
 		[SerializeField]
 		private GameObject _splatPartitionPrefab;
 
+#if UNITY_EDITOR
 		private void OnValidate()
 		{
+			if (Application.isPlaying) return;
+
 			_bounds = new Bounds[NumRows * NumColumns];
 			for (int idx = 0; idx < _bounds.Length; ++idx)
 			{
@@ -34,10 +37,18 @@ namespace GaussianSplatting.Runtime
 			_partitions = new Dictionary<int, SplatPartition>();
 
 		}
+#endif
 
 		private void Awake()
 		{
 			_defaultRenderer = GetComponent<GaussianSplatRenderer>();
+			_bounds = new Bounds[NumRows * NumColumns];
+			for (int idx = 0; idx < _bounds.Length; ++idx)
+			{
+				_bounds[idx] = CalculateBounds(idx);
+			}
+			_partitions = new Dictionary<int, SplatPartition>();
+		
 		}
 		// Update is called once per frame
 		void Update()
@@ -63,8 +74,16 @@ namespace GaussianSplatting.Runtime
 			GameObject instance = GameObject.Instantiate(_splatPartitionPrefab, transform);
 			instance.transform.localRotation = Quaternion.identity;
 			instance.transform.localScale = Vector3.one;
-			Bounds b = GetBounds(partitionIndex);
-			instance.transform.position = b.center;
+			if (partitionIndex >= 0)
+			{
+				Bounds b = GetBounds(partitionIndex);
+				instance.transform.position = b.center;
+
+			}
+			else
+			{
+				instance.transform.position = transform.position;
+			}
 
 			var partition = instance.GetComponent<SplatPartition>();
 			partition.PartitionIndex = partitionIndex;

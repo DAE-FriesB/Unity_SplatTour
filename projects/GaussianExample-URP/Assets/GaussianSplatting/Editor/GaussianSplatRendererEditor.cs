@@ -20,7 +20,7 @@ namespace GaussianSplatting.Editor
     {
         const string kPrefExportBake = "nesnausk.GaussianSplatting.ExportBakeTransform";
 
-        SerializedProperty m_PropAsset;
+        //SerializedProperty m_PropAsset;
         SerializedProperty m_PropSplatScale;
         SerializedProperty m_PropOpacityScale;
         SerializedProperty m_PropSHOrder;
@@ -59,7 +59,7 @@ namespace GaussianSplatting.Editor
         {
             m_ExportBakeTransform = EditorPrefs.GetBool(kPrefExportBake, false);
 
-            m_PropAsset = serializedObject.FindProperty("m_Asset");
+           // m_PropAsset = serializedObject.FindProperty("m_Asset");
             m_PropSplatScale = serializedObject.FindProperty("m_SplatScale");
             m_PropOpacityScale = serializedObject.FindProperty("m_OpacityScale");
             m_PropSHOrder = serializedObject.FindProperty("m_SHOrder");
@@ -90,16 +90,16 @@ namespace GaussianSplatting.Editor
 
             serializedObject.Update();
 
-            GUILayout.Label("Data Asset", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(m_PropAsset);
+            //GUILayout.Label("Data Asset", EditorStyles.boldLabel);
+            //EditorGUILayout.PropertyField(m_PropAsset);
 
-            if (!gs.HasValidAsset)
-            {
-                var msg = gs.asset != null && gs.asset.formatVersion != GaussianSplatAsset.kCurrentVersion
-                    ? "Gaussian Splat asset version is not compatible, please recreate the asset"
-                    : "Gaussian Splat asset is not assigned or is empty";
-                EditorGUILayout.HelpBox(msg, MessageType.Error);
-            }
+            ////if (!gs.HasValidAsset)
+            //{
+            //    var msg = gs.asset != null && gs.asset.formatVersion != GaussianSplatAsset.kCurrentVersion
+            //        ? "Gaussian Splat asset version is not compatible, please recreate the asset"
+            //        : "Gaussian Splat asset is not assigned or is empty";
+            //    EditorGUILayout.HelpBox(msg, MessageType.Error);
+            //}
 
             EditorGUILayout.Space();
             GUILayout.Label("Render Options", EditorStyles.boldLabel);
@@ -125,224 +125,225 @@ namespace GaussianSplatting.Editor
                 EditorGUILayout.PropertyField(m_PropShaderDebugBoxes);
                 EditorGUILayout.PropertyField(m_PropCSSplatUtilities);
             }
-            bool validAndEnabled = gs && gs.enabled && gs.gameObject.activeInHierarchy && gs.HasValidAsset;
-            if (validAndEnabled && !gs.HasValidRenderSetup)
-            {
-                EditorGUILayout.HelpBox("Shader resources are not set up", MessageType.Error);
-                validAndEnabled = false;
-            }
+            //bool validAndEnabled = gs && gs.enabled && gs.gameObject.activeInHierarchy;// && gs.HasValidAsset;
+            //if (validAndEnabled && !gs.HasValidRenderSetup)
+            //{
+            //    EditorGUILayout.HelpBox("Shader resources are not set up", MessageType.Error);
+            //    validAndEnabled = false;
+            //}
 
-            if (validAndEnabled && targets.Length == 1)
-            {
-                EditCameras(gs);
-                EditGUI(gs);
-            }
-            if (validAndEnabled && targets.Length > 1)
-            {
-                MultiEditGUI();
-            }
+            //if (validAndEnabled && targets.Length == 1)
+            //{
+            //    EditCameras(gs);
+            //    EditGUI(gs);
+            //}
+            //if (validAndEnabled && targets.Length > 1)
+            //{
+            //    MultiEditGUI();
+            //}
 
             serializedObject.ApplyModifiedProperties();
         }
 
         void EditCameras(GaussianSplatRenderer gs)
         {
-            var asset = gs.asset;
-            var cameras = asset.cameras;
-            if (cameras != null && cameras.Length != 0)
-            {
-                EditorGUILayout.Space();
-                GUILayout.Label("Cameras", EditorStyles.boldLabel);
-                var camIndex = EditorGUILayout.IntSlider("Camera", m_CameraIndex, 0, cameras.Length - 1);
-                camIndex = math.clamp(camIndex, 0, cameras.Length - 1);
-                if (camIndex != m_CameraIndex)
-                {
-                    m_CameraIndex = camIndex;
-                    gs.ActivateCamera(camIndex);
-                }
-            }
+
+            //var asset = gs.asset;
+            //var cameras = asset.cameras;
+            //if (cameras != null && cameras.Length != 0)
+            //{
+            //    EditorGUILayout.Space();
+            //    GUILayout.Label("Cameras", EditorStyles.boldLabel);
+            //    var camIndex = EditorGUILayout.IntSlider("Camera", m_CameraIndex, 0, cameras.Length - 1);
+            //    camIndex = math.clamp(camIndex, 0, cameras.Length - 1);
+            //    if (camIndex != m_CameraIndex)
+            //    {
+            //        m_CameraIndex = camIndex;
+            //        gs.ActivateCamera(camIndex);
+            //    }
+            //}
         }
 
-        void MultiEditGUI()
-        {
-            DrawSeparator();
-            CountTargetSplats(out var totalSplats, out var totalObjects);
-            EditorGUILayout.LabelField("Total Objects", $"{totalObjects}");
-            EditorGUILayout.LabelField("Total Splats", $"{totalSplats:N0}");
-            if (totalSplats > GaussianSplatAsset.kMaxSplats)
-            {
-                EditorGUILayout.HelpBox($"Can't merge, too many splats (max. supported {GaussianSplatAsset.kMaxSplats:N0})", MessageType.Warning);
-                return;
-            }
+   //     void MultiEditGUI()
+   //     {
+   //         DrawSeparator();
+   //         CountTargetSplats(out var totalSplats, out var totalObjects);
+   //         EditorGUILayout.LabelField("Total Objects", $"{totalObjects}");
+   //         EditorGUILayout.LabelField("Total Splats", $"{totalSplats:N0}");
+   //         if (totalSplats > GaussianSplatAsset.kMaxSplats)
+   //         {
+   //             EditorGUILayout.HelpBox($"Can't merge, too many splats (max. supported {GaussianSplatAsset.kMaxSplats:N0})", MessageType.Warning);
+   //             return;
+   //         }
 
-            var targetGs = (GaussianSplatRenderer) target;
-            if (!targetGs || !targetGs.HasValidAsset || !targetGs.isActiveAndEnabled)
-            {
-                EditorGUILayout.HelpBox($"Can't merge into {target.name} (no asset or disable)", MessageType.Warning);
-                return;
-            }
+   //         var targetGs = (GaussianSplatRenderer) target;
+   //         if (!targetGs || !targetGs.isActiveAndEnabled)// || !targetGs.HasValidAsset)
+			//{
+   //             EditorGUILayout.HelpBox($"Can't merge into {target.name} (no asset or disable)", MessageType.Warning);
+   //             return;
+   //         }
 
-            if (targetGs.asset.chunkData != null)
-            {
-                EditorGUILayout.HelpBox($"Can't merge into {target.name} (needs to use Very High quality preset)", MessageType.Warning);
-                return;
-            }
-            if (GUILayout.Button($"Merge into {target.name}"))
-            {
-                MergeSplatObjects();
-            }
-        }
+   //         //if (targetGs.asset.chunkData != null)
+   //         //{
+   //         //    EditorGUILayout.HelpBox($"Can't merge into {target.name} (needs to use Very High quality preset)", MessageType.Warning);
+   //         //    return;
+   //         //}
+   //         if (GUILayout.Button($"Merge into {target.name}"))
+   //         {
+   //             MergeSplatObjects();
+   //         }
+   //     }
 
-        void CountTargetSplats(out int totalSplats, out int totalObjects)
-        {
-            totalObjects = 0;
-            totalSplats = 0;
-            foreach (var obj in targets)
-            {
-                var gs = obj as GaussianSplatRenderer;
-                if (!gs || !gs.HasValidAsset || !gs.isActiveAndEnabled)
-                    continue;
-                ++totalObjects;
-                totalSplats += gs.splatCount;
-            }
-        }
+   //     void CountTargetSplats(out int totalSplats, out int totalObjects)
+   //     {
+   //         totalObjects = 0;
+   //         totalSplats = 0;
+   //         //foreach (var obj in targets)
+   //         //{
+   //         //    var gs = obj as GaussianSplatRenderer;
+   //         //    if (!gs || !gs.HasValidAsset || !gs.isActiveAndEnabled)
+   //         //        continue;
+   //         //    ++totalObjects;
+   //         //    totalSplats += gs.splatCount;
+   //         //}
+   //     }
 
-        void MergeSplatObjects()
-        {
-            CountTargetSplats(out var totalSplats, out _);
-            if (totalSplats > GaussianSplatAsset.kMaxSplats)
-                return;
-            var targetGs = (GaussianSplatRenderer) target;
+   //     void MergeSplatObjects()
+   //     {
+   //         //CountTargetSplats(out var totalSplats, out _);
+   //         //if (totalSplats > GaussianSplatAsset.kMaxSplats)
+   //         //    return;
+   //         //var targetGs = (GaussianSplatRenderer) target;
 
-            int copyDstOffset = targetGs.splatCount;
-            targetGs.EditSetSplatCount(totalSplats);
-            foreach (var obj in targets)
-            {
-                var gs = obj as GaussianSplatRenderer;
-                if (!gs || !gs.HasValidAsset || !gs.isActiveAndEnabled)
-                    continue;
-                if (gs == targetGs)
-                    continue;
-                gs.EditCopySplatsInto(targetGs, 0, copyDstOffset, gs.splatCount);
-                copyDstOffset += gs.splatCount;
-                gs.gameObject.SetActive(false);
-            }
-            Debug.Assert(copyDstOffset == totalSplats, $"Merge count mismatch, {copyDstOffset} vs {totalSplats}");
-            Selection.activeObject = targetGs;
-        }
+   //         //int copyDstOffset = targetGs.splatCount;
+   //         //targetGs.EditSetSplatCount(totalSplats);
+   //         //foreach (var obj in targets)
+   //         //{
+   //         //    var gs = obj as GaussianSplatRenderer;
+   //         //    if (!gs || !gs.HasValidAsset || !gs.isActiveAndEnabled)
+   //         //        continue;
+   //         //    if (gs == targetGs)
+   //         //        continue;
+   //         //    gs.EditCopySplatsInto(targetGs, 0, copyDstOffset, gs.splatCount);
+   //         //    copyDstOffset += gs.splatCount;
+   //         //    gs.gameObject.SetActive(false);
+   //         //}
+   //         //Debug.Assert(copyDstOffset == totalSplats, $"Merge count mismatch, {copyDstOffset} vs {totalSplats}");
+   //         //Selection.activeObject = targetGs;
+   //     }
 
-        void EditGUI(GaussianSplatRenderer gs)
-        {
-            ++s_EditStatsUpdateCounter;
+   //     void EditGUI(GaussianSplatRenderer gs)
+   //     {
+   //         ++s_EditStatsUpdateCounter;
 
-            DrawSeparator();
-            bool wasToolActive = ToolManager.activeContextType == typeof(GaussianToolContext);
-            GUILayout.BeginHorizontal();
-            bool isToolActive = GUILayout.Toggle(wasToolActive, "Edit", EditorStyles.miniButton);
-            using (new EditorGUI.DisabledScope(!gs.editModified))
-            {
-                if (GUILayout.Button("Reset", GUILayout.ExpandWidth(false)))
-                {
-                    if (EditorUtility.DisplayDialog("Reset Splat Modifications?",
-                            $"This will reset edits of {gs.name} to match the {gs.asset.name} asset. Continue?",
-                            "Yes, reset", "Cancel"))
-                    {
-                        gs.enabled = false;
-                        gs.enabled = true;
-                    }
-                }
-            }
+   //         DrawSeparator();
+   //         bool wasToolActive = ToolManager.activeContextType == typeof(GaussianToolContext);
+   //         GUILayout.BeginHorizontal();
+   //         bool isToolActive = GUILayout.Toggle(wasToolActive, "Edit", EditorStyles.miniButton);
+   //         using (new EditorGUI.DisabledScope(!gs.editModified))
+   //         {
+   //             if (GUILayout.Button("Reset", GUILayout.ExpandWidth(false)))
+   //             {
+   //                 if (EditorUtility.DisplayDialog("Reset Splat Modifications?",
+   //                         $"This will reset edits of {gs.name} to match the {gs.asset.name} asset. Continue?",
+   //                         "Yes, reset", "Cancel"))
+   //                 {
+   //                     gs.enabled = false;
+   //                     gs.enabled = true;
+   //                 }
+   //             }
+   //         }
 
-            GUILayout.EndHorizontal();
-            if (!wasToolActive && isToolActive)
-            {
-                ToolManager.SetActiveContext<GaussianToolContext>();
-                if (Tools.current == Tool.View)
-                    Tools.current = Tool.Move;
-            }
+   //         GUILayout.EndHorizontal();
+   //         if (!wasToolActive && isToolActive)
+   //         {
+   //             ToolManager.SetActiveContext<GaussianToolContext>();
+   //             if (Tools.current == Tool.View)
+   //                 Tools.current = Tool.Move;
+   //         }
 
-            if (wasToolActive && !isToolActive)
-            {
-                ToolManager.SetActiveContext<GameObjectToolContext>();
-            }
+   //         if (wasToolActive && !isToolActive)
+   //         {
+   //             ToolManager.SetActiveContext<GameObjectToolContext>();
+   //         }
 
-            if (isToolActive && gs.asset.chunkData != null)
-            {
-                EditorGUILayout.HelpBox("Splat move/rotate/scale tools need Very High splat quality preset", MessageType.Warning);
-            }
+   //         if (isToolActive && gs.asset.chunkData != null)
+   //         {
+   //             EditorGUILayout.HelpBox("Splat move/rotate/scale tools need Very High splat quality preset", MessageType.Warning);
+   //         }
 
-            EditorGUILayout.Space();
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Add Cutout"))
-            {
-                GaussianCutout cutout = ObjectFactory.CreateGameObject("GSCutout", typeof(GaussianCutout)).GetComponent<GaussianCutout>();
-                Transform cutoutTr = cutout.transform;
-                cutoutTr.SetParent(gs.transform, false);
-                cutoutTr.localScale = (gs.asset.boundsMax - gs.asset.boundsMin) * 0.25f;
-                gs.m_Cutouts ??= Array.Empty<GaussianCutout>();
-                ArrayUtility.Add(ref gs.m_Cutouts, cutout);
-                gs.UpdateEditCountsAndBounds();
-                EditorUtility.SetDirty(gs);
-                Selection.activeGameObject = cutout.gameObject;
-            }
-            if (GUILayout.Button("Use All Cutouts"))
-            {
-                gs.m_Cutouts = FindObjectsByType<GaussianCutout>(FindObjectsSortMode.InstanceID);
-                gs.UpdateEditCountsAndBounds();
-                EditorUtility.SetDirty(gs);
-            }
+   //         EditorGUILayout.Space();
+   //         GUILayout.BeginHorizontal();
+   //         if (GUILayout.Button("Add Cutout"))
+   //         {
+   //             GaussianCutout cutout = ObjectFactory.CreateGameObject("GSCutout", typeof(GaussianCutout)).GetComponent<GaussianCutout>();
+   //             Transform cutoutTr = cutout.transform;
+   //             cutoutTr.SetParent(gs.transform, false);
+   //             cutoutTr.localScale = (gs.asset.boundsMax - gs.asset.boundsMin) * 0.25f;
+   //             gs.m_Cutouts ??= Array.Empty<GaussianCutout>();
+   //             ArrayUtility.Add(ref gs.m_Cutouts, cutout);
+   //             gs.UpdateEditCountsAndBounds();
+   //             EditorUtility.SetDirty(gs);
+   //             Selection.activeGameObject = cutout.gameObject;
+   //         }
+   //         if (GUILayout.Button("Use All Cutouts"))
+   //         {
+   //             gs.m_Cutouts = FindObjectsByType<GaussianCutout>(FindObjectsSortMode.InstanceID);
+   //             gs.UpdateEditCountsAndBounds();
+   //             EditorUtility.SetDirty(gs);
+   //         }
 
-            if (GUILayout.Button("No Cutouts"))
-            {
-                gs.m_Cutouts = Array.Empty<GaussianCutout>();
-                gs.UpdateEditCountsAndBounds();
-                EditorUtility.SetDirty(gs);
-            }
-            GUILayout.EndHorizontal();
-            EditorGUILayout.PropertyField(m_PropCutouts);
+   //         if (GUILayout.Button("No Cutouts"))
+   //         {
+   //             gs.m_Cutouts = Array.Empty<GaussianCutout>();
+   //             gs.UpdateEditCountsAndBounds();
+   //             EditorUtility.SetDirty(gs);
+   //         }
+   //         GUILayout.EndHorizontal();
+   //         EditorGUILayout.PropertyField(m_PropCutouts);
 
-            bool hasCutouts = gs.m_Cutouts != null && gs.m_Cutouts.Length != 0;
-            bool modifiedOrHasCutouts = gs.editModified || hasCutouts;
+   //         bool hasCutouts = gs.m_Cutouts != null && gs.m_Cutouts.Length != 0;
+   //         bool modifiedOrHasCutouts = gs.editModified || hasCutouts;
 
-            var asset = gs.asset;
-            EditorGUILayout.Space();
-            EditorGUI.BeginChangeCheck();
-            m_ExportBakeTransform = EditorGUILayout.Toggle("Export in world space", m_ExportBakeTransform);
-            if (EditorGUI.EndChangeCheck())
-            {
-                EditorPrefs.SetBool(kPrefExportBake, m_ExportBakeTransform);
-            }
+   //         var asset = gs.asset;
+   //         EditorGUILayout.Space();
+   //         EditorGUI.BeginChangeCheck();
+   //         m_ExportBakeTransform = EditorGUILayout.Toggle("Export in world space", m_ExportBakeTransform);
+   //         if (EditorGUI.EndChangeCheck())
+   //         {
+   //             EditorPrefs.SetBool(kPrefExportBake, m_ExportBakeTransform);
+   //         }
 
-            if (GUILayout.Button("Export PLY"))
-                ExportPlyFile(gs, m_ExportBakeTransform);
-            if (asset.posFormat > GaussianSplatAsset.VectorFormat.Norm16 ||
-                asset.scaleFormat > GaussianSplatAsset.VectorFormat.Norm16 ||
-                asset.colorFormat > GaussianSplatAsset.ColorFormat.Float16x4 ||
-                asset.shFormat > GaussianSplatAsset.SHFormat.Float16)
-            {
-                EditorGUILayout.HelpBox(
-                    "It is recommended to use High or VeryHigh quality preset for editing splats, lower levels are lossy",
-                    MessageType.Warning);
-            }
+   //         if (GUILayout.Button("Export PLY"))
+   //             ExportPlyFile(gs, m_ExportBakeTransform);
+   //         if (asset.posFormat > GaussianSplatAsset.VectorFormat.Norm16 ||
+   //             asset.scaleFormat > GaussianSplatAsset.VectorFormat.Norm16 ||
+   //             asset.colorFormat > GaussianSplatAsset.ColorFormat.Float16x4 ||
+   //             asset.shFormat > GaussianSplatAsset.SHFormat.Float16)
+   //         {
+   //             EditorGUILayout.HelpBox(
+   //                 "It is recommended to use High or VeryHigh quality preset for editing splats, lower levels are lossy",
+   //                 MessageType.Warning);
+   //         }
 
-            bool displayEditStats = isToolActive || modifiedOrHasCutouts;
-            EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Splats", $"{gs.splatCount:N0}");
-            if (displayEditStats)
-            {
-                EditorGUILayout.LabelField("Cut", $"{gs.editCutSplats:N0}");
-                EditorGUILayout.LabelField("Deleted", $"{gs.editDeletedSplats:N0}");
-                EditorGUILayout.LabelField("Selected", $"{gs.editSelectedSplats:N0}");
-                if (hasCutouts)
-                {
-                    if (s_EditStatsUpdateCounter > 10)
-                    {
-                        gs.UpdateEditCountsAndBounds();
-                        s_EditStatsUpdateCounter = 0;
-                    }
-                }
-            }
-        }
+   //         bool displayEditStats = isToolActive || modifiedOrHasCutouts;
+   //         EditorGUILayout.Space();
+   //         EditorGUILayout.LabelField("Splats", $"{gs.splatCount:N0}");
+   //         if (displayEditStats)
+   //         {
+   //             EditorGUILayout.LabelField("Cut", $"{gs.editCutSplats:N0}");
+   //             EditorGUILayout.LabelField("Deleted", $"{gs.editDeletedSplats:N0}");
+   //             EditorGUILayout.LabelField("Selected", $"{gs.editSelectedSplats:N0}");
+   //             if (hasCutouts)
+   //             {
+   //                 if (s_EditStatsUpdateCounter > 10)
+   //                 {
+   //                     gs.UpdateEditCountsAndBounds();
+   //                     s_EditStatsUpdateCounter = 0;
+   //                 }
+   //             }
+   //         }
+   //     }
 
         static void DrawSeparator()
         {
@@ -351,25 +352,25 @@ namespace GaussianSplatting.Editor
             EditorGUILayout.Space();
         }
 
-        bool HasFrameBounds()
-        {
-            return true;
-        }
+        //bool HasFrameBounds()
+        //{
+        //    return true;
+        //}
 
-        Bounds OnGetFrameBounds()
-        {
-            var gs = target as GaussianSplatRenderer;
-            if (!gs || !gs.HasValidRenderSetup)
-                return new Bounds(Vector3.zero, Vector3.one);
-            Bounds bounds = default;
-            bounds.SetMinMax(gs.asset.boundsMin, gs.asset.boundsMax);
-            if (gs.editSelectedSplats > 0)
-            {
-                bounds = gs.editSelectedBounds;
-            }
-            bounds.extents *= 0.7f;
-            return TransformBounds(gs.transform, bounds);
-        }
+        //Bounds OnGetFrameBounds()
+        //{
+        //    var gs = target as GaussianSplatRenderer;
+        //    if (!gs || !gs.HasValidRenderSetup)
+        //        return new Bounds(Vector3.zero, Vector3.one);
+        //    Bounds bounds = default;
+        //    bounds.SetMinMax(gs.asset.boundsMin, gs.asset.boundsMax);
+        //    if (gs.editSelectedSplats > 0)
+        //    {
+        //        bounds = gs.editSelectedBounds;
+        //    }
+        //    bounds.extents *= 0.7f;
+        //    return TransformBounds(gs.transform, bounds);
+        //}
 
         public static Bounds TransformBounds(Transform tr, Bounds bounds )
         {

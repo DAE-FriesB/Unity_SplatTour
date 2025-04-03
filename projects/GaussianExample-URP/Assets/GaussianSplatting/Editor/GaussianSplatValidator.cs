@@ -38,6 +38,7 @@ namespace GaussianSplatting.Editor
 
         static unsafe void ValidateImpl(string refPrefix)
         {
+#if FALSE
             var gaussians = Object.FindObjectOfType(typeof(GaussianSplatRenderer)) as GaussianSplatRenderer;
             {
                 if (gaussians == null)
@@ -154,9 +155,10 @@ namespace GaussianSplatting.Editor
             cam.fieldOfView = oldCamFov;
 
             EditorUtility.ClearProgressBar();
-        }
+#endif
+		}
 
-        [BurstCompile]
+		[BurstCompile]
         struct DiffImagesJob : IJob
         {
             public NativeArray<Color32> refPixels;

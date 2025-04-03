@@ -91,7 +91,7 @@ namespace GaussianSplatting.Editor
 			{
 				tempPartitionLists.Add(idx, new List<InputSplatData>());
 			}
-			float scaleFactor = 1f;
+			//float scaleFactor = 1f;
 			for (int idx = 0; idx < inputData.Length; ++idx)
 			{
 				InputSplatData data = inputData[idx];

@@ -10,18 +10,6 @@ using UnityEngine.Rendering;
 
 namespace GaussianSplatting.Runtime
 {
-	class SplatRendererInstance
-	{
-		public SplatRendererInstance(GaussianSplatRenderer renderer, MaterialPropertyBlock block)
-		{
-			Renderer = renderer;
-			PropertyBlock = block;
-		}
-		public bool IsActive { get; set; } = false;
-		public bool ShouldRender => IsActive && !(Renderer == null || !Renderer.isActiveAndEnabled || !Renderer.HasValidAsset || !Renderer.HasValidRenderSetup);
-		public GaussianSplatRenderer Renderer { get; set; }
-		public MaterialPropertyBlock PropertyBlock { get; set; }
-	}
 	class GaussianSplatRenderSystem
 	{
 		// ReSharper disable MemberCanBePrivate.Global - used by HDRP/URP features that are not always compiled
@@ -33,58 +21,57 @@ namespace GaussianSplatting.Runtime
 		public static GaussianSplatRenderSystem instance => ms_Instance ??= new GaussianSplatRenderSystem();
 		static GaussianSplatRenderSystem ms_Instance;
 
-		readonly List<SplatRendererInstance> m_Splats = new List<SplatRendererInstance>();
+		private GaussianSplatRenderer _renderer;
+
+		readonly List<SplatPartition> m_Partitions = new List<SplatPartition>();
 		readonly HashSet<Camera> m_CameraCommandBuffersDone = new();
 
 		CommandBuffer m_CommandBuffer;
 
-		public void RegisterSplat(GaussianSplatRenderer r)
+		public void AddPartition(SplatPartition partition)
 		{
-			if (m_Splats.Count == 0)
-			{
-				if (GraphicsSettings.currentRenderPipeline == null)
-					Camera.onPreCull += OnPreCullCamera;
-			}
-			Debug.Log("Register splat start");
-			if (!m_Splats.Any(s => s.Renderer == r))
-			{
-				m_Splats.Add(new SplatRendererInstance(r, new MaterialPropertyBlock()));
-			}
-			Debug.Log("Register splat end");
+
+		}
+		public void RegisterSplatRenderer(GaussianSplatRenderer r)
+		{
+			if (_renderer != null) return;
+
+
+			if (GraphicsSettings.currentRenderPipeline == null)
+				Camera.onPreCull += OnPreCullCamera;
+
+			_renderer = r;
 		}
 
-		public void SetSplatActive(GaussianSplatRenderer r, bool active)
+		public void SetSplatActive(SplatPartition p, bool active)
 		{
-			var instance = m_Splats.FirstOrDefault(s => s.Renderer == r);
+			var instance = m_Partitions.FirstOrDefault(s => s.Renderer == r);
 			if (instance != null) instance.IsActive = active;
 		}
 
-		public void UnregisterSplat(GaussianSplatRenderer r)
+		public void UnregisterSplatRenderer(GaussianSplatRenderer r)
 		{
-			SplatRendererInstance instance = m_Splats.FirstOrDefault(s => s.Renderer == r);
-			if (instance == null)
+			if (_renderer == null)
 				return;
-			m_Splats.Remove(instance);
 
-			if (m_Splats.Count == 0)
+			if (m_CameraCommandBuffersDone != null)
 			{
-				if (m_CameraCommandBuffersDone != null)
+				if (m_CommandBuffer != null)
 				{
-					if (m_CommandBuffer != null)
+					foreach (var cam in m_CameraCommandBuffersDone)
 					{
-						foreach (var cam in m_CameraCommandBuffersDone)
-						{
-							if (cam)
-								cam.RemoveCommandBuffer(CameraEvent.BeforeForwardAlpha, m_CommandBuffer);
-						}
+						if (cam)
+							cam.RemoveCommandBuffer(CameraEvent.BeforeForwardAlpha, m_CommandBuffer);
 					}
-					m_CameraCommandBuffersDone.Clear();
 				}
-
-				m_CommandBuffer?.Dispose();
-				m_CommandBuffer = null;
-				Camera.onPreCull -= OnPreCullCamera;
+				m_CameraCommandBuffersDone.Clear();
 			}
+
+			m_CommandBuffer?.Dispose();
+			m_CommandBuffer = null;
+			Camera.onPreCull -= OnPreCullCamera;
+
+			_renderer = null;
 		}
 
 		// ReSharper disable once MemberCanBePrivate.Global - used by HDRP/URP features that are not always compiled
@@ -92,14 +79,14 @@ namespace GaussianSplatting.Runtime
 		{
 			if (cam.cameraType == CameraType.Preview)
 				return false;
-			if (!m_Splats.Any(s => s.ShouldRender))
+			if (!m_Partitions.Any(s => s.ShouldRender))
 			{
 				return false;
 			}
-			m_Splats.Sort((a, b) =>
+			m_Partitions.Sort((a, b) =>
 			{
-				var orderA = a.Renderer.RenderOrder;
-				var orderB = b.Renderer.RenderOrder;
+				var orderA = a.RenderOrder;
+				var orderB = b.RenderOrder;
 
 				return orderA.CompareTo(orderB);
 			});
@@ -110,7 +97,7 @@ namespace GaussianSplatting.Runtime
 		public Material SortAndRenderSplats(Camera cam, CommandBuffer cmb)
 		{
 			Material matComposite = null;
-			foreach (var instance in m_Splats)
+			foreach (var instance in m_Partitions)
 			{
 				if (!instance.ShouldRender) continue;
 

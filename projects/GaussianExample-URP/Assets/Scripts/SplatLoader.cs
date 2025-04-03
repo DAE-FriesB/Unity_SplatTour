@@ -14,9 +14,19 @@ using System.Security.Authentication.ExtendedProtection;
 public class SplatAssetInfo
 {
 	public bool ShouldLoad = false;
-	public bool Loaded { get; set; } = false;
+	public bool StartedLoading { get; set; } = false;
+
 	public string Name;
+
+
+
 	public AssetReferenceT<GaussianSplatAsset> Asset;
+
+	public int NumSplats;
+	public GaussianSplatAsset.ColorFormat ColorFormat;
+	public  
+
+	public SplatPartition Partition { get; set; }
 }
 public class SplatLoader : MonoBehaviour
 {
@@ -45,6 +55,7 @@ public class SplatLoader : MonoBehaviour
 				SplatAssetInfo splatAsset = _splatAssets[i];
 				if (splatAsset?.Asset?.editorAsset == null) continue;
 				splatAsset.Name = splatAsset.Asset.editorAsset.name;
+				splatAsset.NumSplats = splatAsset.Asset.editorAsset.splatCount;
 			}
 		}
 	}
@@ -55,6 +66,14 @@ public class SplatLoader : MonoBehaviour
 		_splitter = GetComponent<SplatSplitter>();
 
 		int mainPartitionIndex = _splitter.MainChunkIndex;
+
+		_defaultSplatAsset.Partition = _splitter.CreatePartition(-1);
+		//Prepare splat partitions
+		for(int idx = 0; idx < _splatAssets.Length; ++idx)
+		{
+			SplatPartition p = _splitter.CreatePartition(idx);
+			_splatAssets[idx].Partition = p;
+		}
 
 		//scene loading operation
 		var loadingMonitor = LoadingMonitor.Instance;
@@ -71,9 +90,9 @@ public class SplatLoader : MonoBehaviour
 
 	LoadEvent LoadSplat(SplatAssetInfo splatAssetInfo, int partitionIndex)
 	{
-		if (splatAssetInfo.Loaded || !splatAssetInfo.ShouldLoad) return null;
+		if (splatAssetInfo.StartedLoading || !splatAssetInfo.ShouldLoad) return null;
 
-		splatAssetInfo.Loaded = true;
+		splatAssetInfo.StartedLoading = true;
 
 		var operation = splatAssetInfo.Asset.LoadAssetAsync();
 		//var analysisLogger = DependencyService.GetService<IPerformanceReporter>();
@@ -81,7 +100,7 @@ public class SplatLoader : MonoBehaviour
 		var splatLoadEvent = loadingMonitor.MonitorAsyncOperation(operation, LoadEvent.LoadEventType.LoadSplat, splatAssetInfo.Name);
 		
 		operation.Completed += (task) => _splitter.SplatLoaded(partitionIndex, task.Result);
-
+		
 		return splatLoadEvent;
 	}
 
@@ -117,7 +136,7 @@ public class SplatLoader : MonoBehaviour
 
 		foreach (var asset in _splatAssets)
 		{
-			if (asset.Loaded)
+			if (asset.StartedLoading)
 			{
 				asset.Asset.ReleaseAsset();
 			}

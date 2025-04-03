@@ -11,10 +11,10 @@ namespace GaussianSplatting.Runtime
 		private const int _max_Dist = 100;
 		private readonly Vector3[] _posData;
 
-		public CPUDistanceCalculator(NativeArray<uint> posData, NativeArray<ChunkInfo>? chunkInfos, int numChunks, int formatSize, int count)
+		public CPUDistanceCalculator(Vector3[] posData, NativeArray<ChunkInfo>? chunkInfos, int numChunks, int formatSize, int count)
 		{
 
-			_posData = new Vector3[count];
+			_posData = posData;
 			LoadSplatPositions(posData, formatSize);
 
 			if (chunkInfos.HasValue && numChunks > 0)
@@ -51,7 +51,7 @@ namespace GaussianSplatting.Runtime
 
 
 
-		unsafe void LoadSplatPositions(NativeArray<uint> dataArr, int formatSize)
+		unsafe void LoadSplatPositions(NativeArray<uint> dataArr, int formatSize, int startIdx, int endIdx)
 		{
 
 

@@ -1,6 +1,8 @@
 using JetBrains.Annotations;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.NetworkInformation;
+using UnityEditor.VersionControl;
 using UnityEngine;
 
 namespace GaussianSplatting.Runtime
@@ -18,7 +20,7 @@ namespace GaussianSplatting.Runtime
 		private const float _boundsHeight = 50f;
 
 		private GaussianSplatRenderer _defaultRenderer;
-		private Dictionary<int,GaussianSplatRenderer> _partitionRenderers;
+		private Dictionary<int,SplatPartition> _partitions;
 		[SerializeField]
 		private GameObject _splatPartitionPrefab;
 
@@ -29,7 +31,7 @@ namespace GaussianSplatting.Runtime
 			{
 				_bounds[idx] = CalculateBounds(idx);
 			}
-			_partitionRenderers = new Dictionary<int, GaussianSplatRenderer>();
+			_partitions = new Dictionary<int, SplatPartition>();
 
 		}
 
@@ -37,63 +39,54 @@ namespace GaussianSplatting.Runtime
 		{
 			_defaultRenderer = GetComponent<GaussianSplatRenderer>();
 		}
-		// Start is called once before the first execution of Update after the MonoBehaviour is created
-		void Start()
-		{
-			_defaultRenderer.RenderOrder = 1000; //top priority
-		}
 		// Update is called once per frame
 		void Update()
 		{
-			return;
-			for (int idx = 0; idx < _partitionRenderers.Count; ++idx)
+			for (int idx = 0; idx < _partitions.Count; ++idx)
 			{
-				if (!_partitionRenderers.ContainsKey(idx)) continue;
-				if (_partitionRenderers[idx] == null) continue;
-				_partitionRenderers[idx].enabled = IsVisibleInCamera(idx);
+				if (!_partitions.ContainsKey(idx)) continue;
+				if (_partitions[idx] == null) continue;
+				_partitions[idx].enabled = IsVisibleInCamera(idx);
 
 				//TODO: update rendering order
-				if (_partitionRenderers[idx].enabled)
+				if (_partitions[idx].enabled)
 				{
 					Vector3 toCenter = _bounds[idx].center - Camera.main.transform.position;
 					toCenter.y = 0f;
-					_partitionRenderers[idx].RenderOrder = (uint)Mathf.RoundToInt(toCenter.sqrMagnitude);
+					_partitions[idx].RenderOrder = (uint)Mathf.RoundToInt(toCenter.sqrMagnitude);
 				}
 
 			}
 		}
+		public SplatPartition CreatePartition(int partitionIndex)
+		{
+			GameObject instance = GameObject.Instantiate(_splatPartitionPrefab, transform);
+			instance.transform.localRotation = Quaternion.identity;
+			instance.transform.localScale = Vector3.one;
+			Bounds b = GetBounds(partitionIndex);
+			instance.transform.position = b.center;
+
+			var partition = instance.GetComponent<SplatPartition>();
+			partition.PartitionIndex = partitionIndex;
+			_partitions.Add(partitionIndex, partition);
+			return partition;
+		}
+
+		public void InitializeRenderer()
+		{
+			_defaultRenderer.ReserveResources(_partitions.Values.ToArray());
+		}
 
 		public void SplatLoaded(int partitionIndex, GaussianSplatAsset asset)
 		{
-
-			GaussianSplatRenderer renderer;
-			if (partitionIndex == -1)
-			{
-				renderer = _defaultRenderer;
-				renderer.m_Asset = asset;
-			}
-			else
-			{
-				//return;
-				//Instantiate prefab
-				GameObject instance = GameObject.Instantiate(_splatPartitionPrefab, transform);
-				instance.transform.localRotation = Quaternion.identity;
-				instance.transform.localScale = Vector3.one;
-				Bounds b = GetBounds(partitionIndex);
-				instance.transform.position = b.center;
-		
-				renderer = instance.GetComponent<GaussianSplatRenderer>();
-				_partitionRenderers.Add(partitionIndex,renderer);
-				renderer.m_Asset = asset;
-
-	
-			}
+			var partition = _partitions[partitionIndex];
+			partition.Asset = asset;
 
 			if (IsVisibleInCamera(partitionIndex))
 			{
-				renderer.enabled = true;
+				partition.enabled = true;
 			}
-
+			_defaultRenderer.OnPartitionLoaded(partition);
 		}
 
 		bool IsVisibleInCamera(int partitionIndex)

@@ -16,7 +16,7 @@ MonoBehaviour:
   m_GUID: 02e28b59de000884ea3df84359fdc90f
   m_SerializeEntries:
   - m_GUID: 1e7db70a15863974d855273d30c7ef1b
-    m_Address: Assets/GaussianAssets/nyc_splat
+    m_Address: nyc_splat
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

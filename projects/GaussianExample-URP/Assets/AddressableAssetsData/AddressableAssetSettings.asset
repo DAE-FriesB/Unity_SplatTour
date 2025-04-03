@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: 02e28b59de000884ea3df84359fdc90f
   m_currentHash:
     serializedVersion: 2
-    Hash: 00000000000000000000000000000000
+    Hash: 3f8bcf73c0a70403ec93372bce1114e5
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 1
   m_CatalogRequestsTimeout: 0
@@ -62,10 +62,38 @@ MonoBehaviour:
   m_BuildAddressablesWithPlayerBuild: 0
   m_overridePlayerVersion: '[UnityEditor.PlayerSettings.bundleVersion]'
   m_GroupAssets:
+  - {fileID: 11400000, guid: ced45d5a986395b4fa2f7a0d5f156eb7, type: 2}
   - {fileID: 11400000, guid: e734dbf6732852d489f0dfe5e5507a8e, type: 2}
-  - {fileID: 11400000, guid: a0c2bb5c15aac9e4b88d6032a46d2272, type: 2}
+  - {fileID: 11400000, guid: 34eda00eb9df5644e896145c9d693026, type: 2}
+  - {fileID: 11400000, guid: f37969170747b0f4eb905e84dd6e324f, type: 2}
+  - {fileID: 11400000, guid: 650eb2d04c0cff444bef988b6b172b90, type: 2}
+  - {fileID: 11400000, guid: 5c245ba27a982ed429a2cc8964872cb8, type: 2}
+  - {fileID: 11400000, guid: 9f8bb2e6605a4dd4a993d77dc1d5f87a, type: 2}
+  - {fileID: 11400000, guid: 4c7f84138aeea1a44ae5efce15e28fe2, type: 2}
+  - {fileID: 11400000, guid: 23d88601a5cf6f640be2f2fd5176c16e, type: 2}
+  - {fileID: 11400000, guid: a96a270625b4db04a937f23f2a3bd73d, type: 2}
+  - {fileID: 11400000, guid: 1db2496cef864504694786d53a9c331c, type: 2}
+  - {fileID: 11400000, guid: cf5494aa1ade1104a93c990db1d88f5f, type: 2}
+  - {fileID: 11400000, guid: 8e4c41ef38b5d4b43a49596f823c2851, type: 2}
+  - {fileID: 11400000, guid: 0065b706af1743649ac4e06158319a78, type: 2}
   - {fileID: 11400000, guid: bf03ec1e5eb27e04182449689eed9f17, type: 2}
+  - {fileID: 11400000, guid: f87b06389390c8e4d995abdaeea33427, type: 2}
   - {fileID: 11400000, guid: b784b814d1c45dc4f9dc50dfff72d7f5, type: 2}
+  - {fileID: 11400000, guid: 9d6a038a3744e59499d3e23d2e1bc35e, type: 2}
+  - {fileID: 11400000, guid: 541706548e8888345ae6c417360c8a9e, type: 2}
+  - {fileID: 11400000, guid: 42d18af6c521bf54181d5cc5785d65a5, type: 2}
+  - {fileID: 11400000, guid: 8e1748934d295024ba7191217c23f4a7, type: 2}
+  - {fileID: 11400000, guid: 6f20dc80385e3744496239b68a28ce85, type: 2}
+  - {fileID: 11400000, guid: 45c3a982612c58a49881e5f2ae4bf2b0, type: 2}
+  - {fileID: 11400000, guid: f9f000216a4dcc3458554996ab2dd6b8, type: 2}
+  - {fileID: 11400000, guid: 75eb863a653c25d489b0cb5cccbb9b89, type: 2}
+  - {fileID: 11400000, guid: 934f6c65f72d2544f9c57b596c9ea88d, type: 2}
+  - {fileID: 11400000, guid: a0c2bb5c15aac9e4b88d6032a46d2272, type: 2}
+  - {fileID: 11400000, guid: 50d3495aa92b0ff4b8b961af7c8d38de, type: 2}
+  - {fileID: 11400000, guid: 1d00ab66ff3bb1e47aca3a879a8f3050, type: 2}
+  - {fileID: 11400000, guid: 49f46a4025df0bc4fa233c32877e984b, type: 2}
+  - {fileID: 11400000, guid: 383dbf9af9b981c4e8bceed0443e56b6, type: 2}
+  - {fileID: 11400000, guid: c7e7a48205e4f514ebae0d95e60bc5a7, type: 2}
   m_BuildSettings:
     m_LogResourceManagerExceptions: 1
     m_BundleBuildPath: Temp/com.unity.addressables/AssetBundles

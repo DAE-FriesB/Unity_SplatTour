@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: ALAMEDA_P00
+  m_EditorClassIdentifier: 
+  m_GroupName: ALAMEDA_P00
+  m_GUID: 821bd3cfcedbc7645ac8bdf48db65fd8
+  m_SerializeEntries:
+  - m_GUID: 266bd541ee9b993468673f4895097bab
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_P00.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 57e324bfa16115547a4096c77293cea9
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_P00_oth.bytes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b23d23a8926dc964796bb08735c5ce5b
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_P00_pos.bytes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b6103b004df94214fa9b0363d0a0e535
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_P00_col.bytes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e7882a44cb89acd42b20a40a0784286d
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_P00_shs.bytes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 75d5932bbefdaef49a885ceb3c2c0753, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: e7aa1c3949748804aab88806364ab7d2, type: 2}
+    - {fileID: 11400000, guid: 631b2ed308ddb8a42a8902774dc2148b, type: 2}

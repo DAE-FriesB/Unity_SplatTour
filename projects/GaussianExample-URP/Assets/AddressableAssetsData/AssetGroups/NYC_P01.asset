@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: NYC_P01
   m_EditorClassIdentifier: 
   m_GroupName: NYC_P01
-  m_GUID: 593c77b57d21b534789316973147f92c
+  m_GUID: b3ff20181ba8cb145abf02ab239815a0
   m_SerializeEntries:
   - m_GUID: 2708a624cb24712489c9402e6b56240d
     m_Address: Assets/GaussianAssets/nyc_splat/nyc_splat_P01_shs.bytes

@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: ALAMEDA_P12
+  m_EditorClassIdentifier: 
+  m_GroupName: ALAMEDA_P12
+  m_GUID: 0263c21a79500ab40b980ea9c904b65e
+  m_SerializeEntries:
+  - m_GUID: 029976d696461c949bb7f8866b216810
+    m_Address: CaptureTest-alameda-splat2-splat_P12_shs
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 734ed6c6e9dddad4383eab02a7276bd4
+    m_Address: CaptureTest-alameda-splat2-splat_P12_oth
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7ccb8c933f0d87b489369f9ef2503a99
+    m_Address: CaptureTest-alameda-splat2-splat_P12_col
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 850e9b34161dda942826fa1bf560a2c0
+    m_Address: CaptureTest-alameda-splat2-splat_P12_pos
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d040ac8b5e0d2e243a164318a378956c
+    m_Address: CaptureTest-alameda-splat2-splat_P12
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 75d5932bbefdaef49a885ceb3c2c0753, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 3065ecaeb62ab96499597d78d3458587, type: 2}
+    - {fileID: 11400000, guid: 10e349e7ec9b53f47b5b0af86202a487, type: 2}

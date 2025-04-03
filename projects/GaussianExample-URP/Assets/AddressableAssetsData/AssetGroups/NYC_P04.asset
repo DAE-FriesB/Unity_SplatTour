@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: NYC_P04
+  m_EditorClassIdentifier: 
+  m_GroupName: NYC_P04
+  m_GUID: 91800308141b5fd41a96b8ca9ca06e00
+  m_SerializeEntries:
+  - m_GUID: 2c1d6987d6634a744b8f584d38273f75
+    m_Address: Assets/GaussianAssets/nyc_splat/nyc_splat_P04_pos.bytes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3b52f3112e4ee0c48b1805bd2def48a7
+    m_Address: Assets/GaussianAssets/nyc_splat/nyc_splat_P04_col.bytes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6d3bb3ce29cb8b345939b9faf29399f7
+    m_Address: Assets/GaussianAssets/nyc_splat/nyc_splat_P04.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7c36c91c7060ee841b63db8c973a349c
+    m_Address: Assets/GaussianAssets/nyc_splat/nyc_splat_P04_oth.bytes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b1d0b573062a2ec44ab02c9b4da6b59c
+    m_Address: Assets/GaussianAssets/nyc_splat/nyc_splat_P04_shs.bytes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 75d5932bbefdaef49a885ceb3c2c0753, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: b78305f37bec0104eb2e2ac95b9e1ae0, type: 2}
+    - {fileID: 11400000, guid: 867e59580401a0a4cae2a8fff8142175, type: 2}

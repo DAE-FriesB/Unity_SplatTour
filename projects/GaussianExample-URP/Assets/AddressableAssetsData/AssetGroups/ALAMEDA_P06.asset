@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: ALAMEDA_P06
+  m_EditorClassIdentifier: 
+  m_GroupName: ALAMEDA_P06
+  m_GUID: 9644dad2d0369d74eb1125a28401a22a
+  m_SerializeEntries:
+  - m_GUID: 4b1cbf518ffb0ec469aaca20934dce25
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_P06_pos.bytes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4c14c0bebd1dd4948be2790ecd74cc12
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_P06_oth.bytes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c11e485a9a34f384488f2937804521e3
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_P06.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dca11482b9a1dff43b152d1e0ff7d801
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_P06_shs.bytes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fad8bf2795cc16549891ee75c001baf7
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_P06_col.bytes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 75d5932bbefdaef49a885ceb3c2c0753, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 3a865cadd578f444d9f0a5907fb793bb, type: 2}
+    - {fileID: 11400000, guid: 444b6c13f68524d4d8877b0219b39aa7, type: 2}

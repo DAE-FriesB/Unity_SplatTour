@@ -26,6 +26,8 @@ namespace Analysis
 		private IPerformanceReporter _analysisLogger = null;
 		private ITimeService _timeService = null;
 
+		[SerializeField]
+		private bool _autoPlay;
 		private void Awake()
 		{
 			Debug.Log("Benchmarking Awake");
@@ -74,7 +76,7 @@ namespace Analysis
 
 			//start autoplay
 			AutoPlaySystem autoPlay = FindAnyObjectByType<AutoPlaySystem>();
-			if (autoPlay != null)
+			if (autoPlay != null && _autoPlay)
 			{
 				autoPlay.FinishedPlaying += AutoPlay_FinishedPlaying;
 				autoPlay.ShouldAutoPlay = true;

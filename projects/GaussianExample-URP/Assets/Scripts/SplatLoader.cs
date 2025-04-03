@@ -7,18 +7,25 @@ using Timing;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using System.Linq;
+using System.Security.Authentication.ExtendedProtection;
 
+[System.Serializable]
+public class SplatAssetInfo
+{
+	public bool ShouldLoad = false;
+	public bool Loaded { get; set; } = false;
+	public string Name;
+	public AssetReferenceT<GaussianSplatAsset> Asset;
+}
 public class SplatLoader : MonoBehaviour
 {
-	[SerializeField]
-	private string _mainSplatName = "";
-	[SerializeField]
-	private AssetReferenceT<GaussianSplatAsset> _splatAsset;
-	[SerializeField]
-	private GaussianSplatRenderer _renderer;
 
 	[SerializeField]
-	private GaussianSplatAsset[] _splatAssets;
+	private SplatAssetInfo _defaultSplatAsset;
+
+	[SerializeField]
+	private SplatAssetInfo[] _splatAssets;
 
 	public bool IsLoaded { get; private set; }
 	private SplatSplitter _splitter;
@@ -26,11 +33,19 @@ public class SplatLoader : MonoBehaviour
 #if UNITY_EDITOR
 	private void OnValidate()
 	{
-		_renderer = GetComponent<GaussianSplatRenderer>();
-		_renderer.enabled = false;
-		if(_splatAsset != null && string.IsNullOrEmpty(_mainSplatName))
+		if (_defaultSplatAsset?.Asset?.editorAsset != null)
 		{
-			_mainSplatName = _splatAsset.editorAsset.name;
+			_defaultSplatAsset.Name = _defaultSplatAsset.Asset.editorAsset.name;
+		}
+
+		if (_splatAssets.Any())
+		{
+			for (int i = 0; i < _splatAssets.Length; i++)
+			{
+				SplatAssetInfo splatAsset = _splatAssets[i];
+				if (splatAsset?.Asset?.editorAsset == null) continue;
+				splatAsset.Name = splatAsset.Asset.editorAsset.name;
+			}
 		}
 	}
 #endif
@@ -38,63 +53,75 @@ public class SplatLoader : MonoBehaviour
 	public void Awake()
 	{
 		_splitter = GetComponent<SplatSplitter>();
-		//TODO: start with loading the main asset (from splitter: mainChunkIdx)
-		var operation = _splatAsset.LoadAssetAsync();
-		//var analysisLogger = DependencyService.GetService<IPerformanceReporter>();
-		var loadingMonitor = LoadingMonitor.Instance;
+
+		int mainPartitionIndex = _splitter.MainChunkIndex;
 
 		//scene loading operation
-		var sceneLoadEvent = loadingMonitor.FindActiveOperation((ev) => ev.EventType == LoadEvent.LoadEventType.LoadScene );
-		var splatLoadEvent = loadingMonitor.MonitorAsyncOperation(operation, LoadEvent.LoadEventType.LoadSplat, _mainSplatName);
+		var loadingMonitor = LoadingMonitor.Instance;
 
-		if(sceneLoadEvent != null)
-		{
-			sceneLoadEvent.ChildLoadingEvent = splatLoadEvent;
-		}
+		//var sceneLoadEvent = loadingMonitor.FindActiveOperation((ev) => ev.EventType == LoadEvent.LoadEventType.LoadScene);
+		//if (sceneLoadEvent != null)
+		//{
+		//	sceneLoadEvent.ChildLoadingEvent = LoadSplat(_splatAssets[mainPartitionIndex], mainPartitionIndex);
+		//	sceneLoadEvent.Completed += (s, e) => IsLoaded = true;
+		//}
+	}
 
-		operation.Completed += SplatLoader_Completed;
+
+
+	LoadEvent LoadSplat(SplatAssetInfo splatAssetInfo, int partitionIndex)
+	{
+		if (splatAssetInfo.Loaded || !splatAssetInfo.ShouldLoad) return null;
+
+		splatAssetInfo.Loaded = true;
+
+		var operation = splatAssetInfo.Asset.LoadAssetAsync();
+		//var analysisLogger = DependencyService.GetService<IPerformanceReporter>();
+		var loadingMonitor = LoadingMonitor.Instance;
+		var splatLoadEvent = loadingMonitor.MonitorAsyncOperation(operation, LoadEvent.LoadEventType.LoadSplat, splatAssetInfo.Name);
 		
+		operation.Completed += (task) => _splitter.SplatLoaded(partitionIndex, task.Result);
+
+		return splatLoadEvent;
+	}
+
+	private void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.Space))
+		{
+			LoadAdditionalSplats(false);
+		}
 	}
 
 	private void Start()
 	{
-		LoadAdditionalSplats();
+		LoadAdditionalSplats(true);
 	}
 
-	void LoadAdditionalSplats()
+	void LoadAdditionalSplats(bool mainOnly = false)
 	{
-		
+		LoadSplat(_defaultSplatAsset, -1);
+		if (mainOnly) return;
 		for (int idx = 0; idx < _splatAssets.Length; idx++)
 		{
-			GaussianSplatAsset asset = _splatAssets[idx];
-			if (asset == _splatAsset.Asset) continue;
-			//TODO: Load splatasset from addressables
-
-			//Instantiate prefab in splitter
-			_splitter.SplatLoaded(idx, asset);
-		
+			SplatAssetInfo asset = _splatAssets[idx];
+			LoadSplat(asset, idx);
 		}
 	}
 
-	private void SplatLoader_Completed(AsyncOperationHandle<GaussianSplatAsset> obj)
-	{
-		_renderer.m_Asset = obj.Result;
-		_renderer.enabled = true;
-		IsLoaded = true;
-	}
+
 
 	public void OnDestroy()
 	{
-		if (_renderer != null)
-		{
-			_renderer.enabled = false;
-			_renderer.m_Asset = null;
-		}
-		_splatAsset.ReleaseAsset();
-	}
-	// Update is called once per frame
-	void Update()
-	{
+		_defaultSplatAsset.Asset.ReleaseAsset();
 
+		foreach (var asset in _splatAssets)
+		{
+			if (asset.Loaded)
+			{
+				asset.Asset.ReleaseAsset();
+			}
+		}
 	}
+
 }

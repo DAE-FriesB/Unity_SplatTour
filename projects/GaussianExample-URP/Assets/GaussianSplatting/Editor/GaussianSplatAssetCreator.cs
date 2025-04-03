@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using GaussianSplatting.Editor.Utils;
 using GaussianSplatting.Runtime;
+using NUnit.Framework.Constraints;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -40,12 +41,16 @@ namespace GaussianSplatting.Editor
 		[SerializeField] string m_InputFile;
 		[SerializeField] bool m_ImportCameras = true;
 
+
+
 		[SerializeField] string m_OutputFolder = "Assets/GaussianAssets";
 		[SerializeField] DataQuality m_Quality = DataQuality.Medium;
 		[SerializeField] GaussianSplatAsset.VectorFormat m_FormatPos;
 		[SerializeField] GaussianSplatAsset.VectorFormat m_FormatScale;
 		[SerializeField] GaussianSplatAsset.ColorFormat m_FormatColor;
 		[SerializeField] GaussianSplatAsset.SHFormat m_FormatSH;
+
+		string _bundleName = "";
 
 		string m_ErrorMessage;
 		string m_PrevPlyPath;
@@ -169,6 +174,10 @@ namespace GaussianSplatting.Editor
 			//Splitting settings
 			_toggleSplitSettings = EditorGUILayout.BeginToggleGroup("Splat Splitting", _toggleSplitSettings);
 			_splitConfig.DrawEditorGUI(_toggleSplitSettings);
+			_bundleName = EditorGUILayout.TextField("Bundle_Prefix", _bundleName);
+			if(string.IsNullOrWhiteSpace(_bundleName))
+				_bundleName  = Path.GetFileNameWithoutExtension(FilePickerControl.PathToDisplayString(m_InputFile));
+
 			EditorGUILayout.EndToggleGroup();
 
 			EditorGUILayout.Space();
@@ -179,7 +188,10 @@ namespace GaussianSplatting.Editor
 				CreateAsset();
 			}
 			GUILayout.Space(30);
+			
+			
 			GUILayout.EndHorizontal();
+
 
 			if (!string.IsNullOrWhiteSpace(m_ErrorMessage))
 			{
@@ -372,8 +384,11 @@ namespace GaussianSplatting.Editor
 				AssetDatabase.SaveAssets();
 				EditorUtility.ClearProgressBar();
 				Selection.activeObject = savedAsset;
+				AssetDatabase.Refresh();
 
-				_splitConfig.CreateAddressables(baseName, asset);
+				List<string> assetPaths = new List<string>() { assetPath, pathPos, pathOther, pathCol, pathSh };
+				if (useChunks) assetPaths.Add(pathChunk);
+				_splitConfig.CreateAddressables(_bundleName+"_"+partitionSuffix, assetPaths);
 
 				inputSplats.Dispose();
 			}

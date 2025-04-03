@@ -17,7 +17,7 @@ namespace Analysis
 		}
 	}
 
-	public class TimestampEventArgs: EventArgs
+	public class TimestampEventArgs : EventArgs
 	{
 		public TimestampEventArgs(DateTime endTime)
 		{
@@ -33,9 +33,13 @@ namespace Analysis
 		{
 			get => _childLoadingEvent; set
 			{
+				if(_childLoadingEvent != null)
+				{
+					throw new InvalidOperationException("Cannot set child loading event multiple times");
+				}
 				_childLoadingEvent = value;
 
-				if(_childLoadingEvent != null)
+				if (_childLoadingEvent != null)
 				{
 					_childLoadingEvent.Completed += _childLoadingEvent_Completed;
 				}
@@ -44,8 +48,11 @@ namespace Analysis
 
 		private void _childLoadingEvent_Completed(object sender, TimestampEventArgs e)
 		{
-			_childLoadingEvent.Completed -= _childLoadingEvent_Completed;
-			_childLoadingEvent = null;
+			if (_childLoadingEvent != null)
+			{
+				_childLoadingEvent.Completed -= _childLoadingEvent_Completed;
+				_childLoadingEvent = null;
+			}
 			OperationFinished(e.TimeStamp);
 		}
 

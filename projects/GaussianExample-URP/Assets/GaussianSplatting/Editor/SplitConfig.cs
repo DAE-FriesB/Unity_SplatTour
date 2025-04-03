@@ -8,8 +8,13 @@ using System.Linq;
 using System.Net.Http.Headers;
 using Unity.Collections;
 using UnityEditor;
+using UnityEditor.AddressableAssets.Settings.GroupSchemas;
+using UnityEditor.AddressableAssets;
+using UnityEditor.Graphs;
 using UnityEngine;
 using static GaussianSplatting.Editor.GaussianSplatAssetCreator;
+using UnityEditor.AddressableAssets.Settings;
+using Object = UnityEngine.Object;
 
 
 namespace GaussianSplatting.Editor
@@ -118,10 +123,40 @@ namespace GaussianSplatting.Editor
 		}
 
 
-		public void CreateAddressables(string baseName, GaussianSplatAsset asset)
+		public void CreateAddressables(string baseName, List<string> assetPaths)
 		{
 			//TODO: Create addressables for this asset
-			
+
+			var settings = AddressableAssetSettingsDefaultObject.Settings;
+			if (settings)
+			{
+				var group = settings.FindGroup(baseName);
+				if (group != null)
+				{
+					settings.RemoveGroup(group);
+				}
+
+				//var template = AssetDatabase.LoadAssetAtPath<AddressableAssetGroupTemplate>("Assets/AddressableAssetsData/AssetGroupTemplates/Packed Assets");
+				var template = settings.GroupTemplateObjects.OfType<AddressableAssetGroupTemplate>().FirstOrDefault();
+				group = settings.CreateGroup(baseName, false, false, true, template.SchemaObjects, typeof(ContentUpdateGroupSchema), typeof(BundledAssetGroupSchema));
+				
+				var entriesAdded = assetPaths.Select(p => AddToAddressableGroup(p, settings, group)).ToList();
+
+
+				group.SetDirty(AddressableAssetSettings.ModificationEvent.EntryMoved, entriesAdded, false, true);
+				settings.SetDirty(AddressableAssetSettings.ModificationEvent.EntryMoved, entriesAdded, true, false);
+				AssetDatabase.SaveAssetIfDirty(group);
+				AssetDatabase.SaveAssetIfDirty(settings);
+			}
+
+		}
+
+		private static AddressableAssetEntry AddToAddressableGroup(string assetPath, AddressableAssetSettings settings, AddressableAssetGroup group)
+		{
+			GUID assetGuid = AssetDatabase.GUIDFromAssetPath(assetPath);
+
+			var e = settings.CreateOrMoveEntry(assetGuid.ToString(), group, false, false);
+			return e;
 		}
 
 	}

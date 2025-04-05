@@ -13,30 +13,30 @@ MonoBehaviour:
   m_Name: ALAMEDA_P12
   m_EditorClassIdentifier: 
   m_GroupName: ALAMEDA_P12
-  m_GUID: 0263c21a79500ab40b980ea9c904b65e
+  m_GUID: 71f51e175201f504cb438010adf7b7e1
   m_SerializeEntries:
   - m_GUID: 029976d696461c949bb7f8866b216810
-    m_Address: CaptureTest-alameda-splat2-splat_P12_shs
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_P12_shs.bytes
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 734ed6c6e9dddad4383eab02a7276bd4
-    m_Address: CaptureTest-alameda-splat2-splat_P12_oth
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_P12_oth.bytes
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7ccb8c933f0d87b489369f9ef2503a99
-    m_Address: CaptureTest-alameda-splat2-splat_P12_col
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_P12_col.bytes
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 850e9b34161dda942826fa1bf560a2c0
-    m_Address: CaptureTest-alameda-splat2-splat_P12_pos
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_P12_pos.bytes
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d040ac8b5e0d2e243a164318a378956c
-    m_Address: CaptureTest-alameda-splat2-splat_P12
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_P12.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

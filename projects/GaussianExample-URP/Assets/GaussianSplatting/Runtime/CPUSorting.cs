@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace GaussianSplatting.Runtime
 {
@@ -35,18 +36,18 @@ namespace GaussianSplatting.Runtime
 			}
 		}
 
-		private static uint GetMax(ref uint[] inputValues, int n)
-		{
-			uint max = inputValues[0];
-			for (int i = 1; i < n; i++)
-			{
-				if (inputValues[i] > max)
-				{
-					max = inputValues[i];
-				}
-			}
-			return max;
-		}
+		//private static uint GetMax(ref uint[] inputValues, int startIndex, int amount)
+		//{
+		//	uint max = inputValues[0];
+		//	for (int i = 1; i < n; i++)
+		//	{
+		//		if (inputValues[i] > max)
+		//		{
+		//			max = inputValues[i];
+		//		}
+		//	}
+		//	return max;
+		//}
 
 		private static uint GetBaseValue(uint value, int shiftAmount)
 		{
@@ -77,9 +78,10 @@ namespace GaussianSplatting.Runtime
 			//Move around values
 			for (int i = (int)amount - 1; i >= 0; i--)
 			{
-				uint index = GetBaseValue(inputValues[i], shiftAmt);
-
+				
 				int sourceIndex = startIndex + i;
+				uint index = GetBaseValue(inputValues[sourceIndex], shiftAmt);
+
 				int targetIndex = startIndex + (int)_countArr[index] - 1;
 				_outputValues[targetIndex] = inputValues[sourceIndex];
 				_outputKeys[targetIndex] = inputKeys[sourceIndex];
@@ -93,5 +95,49 @@ namespace GaussianSplatting.Runtime
 				inputKeys[arrIndex] = _outputKeys[arrIndex];
 			}
 		}
+
+		internal void ReorderPartitions(SplatPartition[] partitions, ref int[] previousOrder, ref uint[] inputValues, ref uint[] inputKeys)
+		{
+			//int[] previousStartIndices = new int[partitions.Length];
+			//for(int idx =0; idx < previousOrder.Length; ++idx)
+			//{
+			//	int prevPartitionIdx = previousOrder[idx];
+			//	var partition = partitions.Single(p => p.PartitionIndex == prevPartitionIdx);
+			//	previousStartIndices[idx] = partition.StartIndex;
+			//}
+
+			int startIndex = 0;
+			for(int pIdx = 0; pIdx < partitions.Length; ++pIdx)
+			{
+				var partition = partitions[pIdx];
+				int prevStartIndex = partition.StartIndex;
+				previousOrder[pIdx] = partition.PartitionIndex;
+
+				if (prevStartIndex == -1) continue;
+				
+				partition.StartIndex = startIndex;
+
+				for(int splatIdx = 0; splatIdx < partition.SplatCount; ++splatIdx)
+				{
+					int fromIndex = prevStartIndex + splatIdx;
+					int toIndex = startIndex + splatIdx;
+
+					_outputKeys[toIndex] = inputKeys[fromIndex];
+					_outputValues[toIndex] = inputValues[fromIndex];
+				}
+				startIndex += partition.SplatCount;
+			}
+
+			while(startIndex > 0)
+			{
+				--startIndex;
+				inputValues[startIndex] = _outputValues[startIndex];
+				inputKeys[startIndex] = _outputKeys[startIndex];
+			}
+
+
+		}
+
+
 	}
 }

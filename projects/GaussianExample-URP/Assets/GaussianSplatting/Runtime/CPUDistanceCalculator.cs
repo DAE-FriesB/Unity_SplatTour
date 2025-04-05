@@ -44,7 +44,7 @@ namespace GaussianSplatting.Runtime
 
 
 
-		public unsafe void LoadSplatPositions(NativeArray<float3> dataArr, int offsetIdx, int count, Transform partition, Transform renderer)
+		public unsafe void LoadSplatPositions(NativeArray<float> dataArr, int offsetIdx, int count, Transform partition, Transform renderer)
 		{
 			Vector3 result = new Vector3();
 
@@ -52,6 +52,7 @@ namespace GaussianSplatting.Runtime
 			var t1 = renderer;
 			var matrix = t1.worldToLocalMatrix * t2.localToWorldMatrix;
 
+			float3* dataPtr = (float3*)dataArr.GetUnsafeReadOnlyPtr<float>();
 			for (int idx = 0; idx < count; ++idx)//12 = formatSize (based on Float32 for position format)
 			{
 				int targetidx = offsetIdx + idx;
@@ -61,7 +62,7 @@ namespace GaussianSplatting.Runtime
 				//		DecodeNorm11ToVec(inputPtr, ref result);
 				//		break;
 				//	default:
-				result = dataArr[idx];
+				result = dataPtr[idx];
 				//		break;
 				//}
 

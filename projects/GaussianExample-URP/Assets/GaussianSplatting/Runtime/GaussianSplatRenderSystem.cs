@@ -10,7 +10,7 @@ using UnityEngine.Rendering;
 
 namespace GaussianSplatting.Runtime
 {
-	class GaussianSplatRenderSystem
+	public class GaussianSplatRenderSystem
 	{
 		// ReSharper disable MemberCanBePrivate.Global - used by HDRP/URP features that are not always compiled
 		internal static readonly ProfilerMarker s_ProfDraw = new(ProfilerCategory.Render, "GaussianSplat.Draw", MarkerFlags.SampleGPU);
@@ -46,9 +46,20 @@ namespace GaussianSplatting.Runtime
 
 		public void SetSplatActive(SplatPartition p, bool active)
 		{
+			if (p.IsActive == active) return;
 			p.IsActive = active;
-			//var instance = m_Partitions.FirstOrDefault(s => s.Renderer == r);
-			//if (instance != null) instance.IsActive = active;
+			if (_renderer != null)
+			{
+				if (active)
+				{
+					_renderer.RegisterPartition(p);
+				}
+				else
+				{
+					_renderer.UnregisterPartition(p);
+				}
+			}
+
 		}
 
 		public void UnRegisterSplatRenderer(GaussianSplatRenderer r)
@@ -83,11 +94,11 @@ namespace GaussianSplatting.Runtime
 				return false;
 			if (cam.cameraType == CameraType.Preview)
 				return false;
-			if (_renderer.GatherAndSortSplatsForCamera(cam))
+			if (_renderer.GatherPartitionsForCamera(cam))
 			{
 				return true;
 			}
-			
+
 
 			return true;
 		}

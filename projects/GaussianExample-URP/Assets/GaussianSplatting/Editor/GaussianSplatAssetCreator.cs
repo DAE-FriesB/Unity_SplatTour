@@ -1012,8 +1012,7 @@ namespace GaussianSplatting.Editor
 			public unsafe void Execute(int index)
 			{
 				var splat = m_Input[index];
-				int idx = index * 16;
-				((float4*)m_Output.GetUnsafePtr())[idx] = new float4(splat.dc0.x, splat.dc0.y, splat.dc0.z, splat.opacity);
+				((float4*)m_Output.GetUnsafePtr())[index] = new float4(splat.dc0.x, splat.dc0.y, splat.dc0.z, splat.opacity);
 			}
 		}
 
@@ -1034,13 +1033,14 @@ namespace GaussianSplatting.Editor
 		void CreateColorDataBasic(NativeArray<InputSplatData> inputSplats, string filePath, ref Hash128 dataHash)
 		{
 			NativeArray<byte> data = new NativeArray<byte>(inputSplats.Length * 16, Allocator.TempJob);
+			
 			CreateColorDataJob2 simpleConvert = new CreateColorDataJob2()
 			{
 				m_Input = inputSplats,
 				m_Output = data
 			};
 			dataHash.Append(data);
-			simpleConvert.Schedule(inputSplats.Length, 8196).Complete();
+			simpleConvert.Schedule(inputSplats.Length, 1024).Complete();
 			using var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write);
 			fs.Write(simpleConvert.m_Output);
 			simpleConvert.m_Output.Dispose();

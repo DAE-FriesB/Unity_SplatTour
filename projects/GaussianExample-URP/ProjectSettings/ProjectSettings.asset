@@ -662,7 +662,7 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   scriptingDefineSymbols:
-    WebGL: SORT_CPU
+    WebGL: SORT_NONE
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}

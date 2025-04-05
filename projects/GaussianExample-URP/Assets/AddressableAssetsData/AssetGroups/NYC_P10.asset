@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: NYC_P10
   m_EditorClassIdentifier: 
   m_GroupName: NYC_P10
-  m_GUID: bd40733202e9c074c8dbe31a5aa46efe
+  m_GUID: d90507914a80dda459b0fdb1d4227f30
   m_SerializeEntries:
   - m_GUID: 1145555bbc595214280c13a45daaf927
     m_Address: Assets/GaussianAssets/nyc_splat/nyc_splat_P10.asset

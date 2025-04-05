@@ -1,17 +1,13 @@
 // SPDX-License-Identifier: MIT
 
 using System;
-using System.Collections.Concurrent;
 using System.Linq;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using Unity.Profiling;
 using Unity.Profiling.LowLevel;
-using UnityEditor.VersionControl;
 using UnityEngine;
-using UnityEngine.Analytics;
-using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.XR;
 using static GaussianSplatting.Runtime.GaussianSplatAsset;
@@ -83,7 +79,7 @@ namespace GaussianSplatting.Runtime
 		public ComputeShader m_CSSplatUtilities;
 
 		int m_ReservedSplatCount;
-		int m_RegisteredSplatCount; // initially same as asset splat count, but editing can change this
+		int m_RegisteredSplatCount;
 		uint[] m_GpuSortDistances;
 		uint[] m_GpuSortIndices;
 
@@ -119,6 +115,8 @@ namespace GaussianSplatting.Runtime
 		private GaussianSplatAsset.SHFormat _shFormat = GaussianSplatAsset.SHFormat.Float32;
 
 		private SplatPartition[] _partitions;
+		private int[] _partitionsOrder;
+		private int _numRegisteredPartitions = 0;
 
 		internal static class Props
 		{
@@ -168,38 +166,71 @@ namespace GaussianSplatting.Runtime
 
 
 		const int kGpuViewDataSize = 40;
-		public void OnPartitionLoaded(SplatPartition partition)
+		public void RegisterPartition(SplatPartition partition)
 		{
+			if (partition.StartIndex >= 0) return; //already registered
 			if (!partition.HasValidAsset)
 			{
 				Debug.Log("No valid asset for partition " + partition.PartitionIndex);
+				return;
 			}
+
+
 			partition.StartIndex = m_RegisteredSplatCount;
-			NativeArray<float3> posData = partition.Asset.posData.GetData<float3>();
+			_partitionsOrder[_numRegisteredPartitions] = partition.PartitionIndex;
+			Debug.Log("Merging partition data");
+			MergePartitionData(partition);
+
+			Debug.Log("Partition data merged");
+
+			m_RegisteredSplatCount += partition.SplatCount;
+			++_numRegisteredPartitions;
+		}
+
+		public void UnregisterPartition(SplatPartition partition)
+		{
+			
+		}
+
+		private void MergePartitionData(SplatPartition partition)
+		{
+
+			NativeArray<float> posData = partition.Asset.posData.GetData<float>();
+			NativeArray<float4> colorData = partition.Asset.colorData.GetData<float4>();
+			NativeArray<uint> shData = partition.Asset.shData.GetData<uint>();
+			NativeArray<uint> otherData = partition.Asset.otherData.GetData<uint>();
 
 			//Merge Position data
 			m_distCalculator.LoadSplatPositions(posData, partition.StartIndex, partition.SplatCount, partition.transform, this.transform);
-			m_RegisteredSplatCount += partition.SplatCount;
+			
 			m_GpuPosData.SetData(_combinedData.PosData, partition.StartIndex, partition.StartIndex, partition.SplatCount);
 
 			//Merge Color data
-			_combinedData.CopyColorData(partition.StartIndex, partition.SplatCount, partition.Asset.colorData.GetData<float4>());
-			m_GpuColorData.SetData(_combinedData.ColorData, partition.StartIndex, partition.StartIndex,partition.SplatCount);
+			_combinedData.CopyColorData(partition.StartIndex, partition.SplatCount, colorData);
+			m_GpuColorData.SetData(_combinedData.ColorData, partition.StartIndex, partition.StartIndex, partition.SplatCount);
 
 			//Merge SH data
-			int shSize = UnsafeUtility.SizeOf<SHTableItemFloat32>()/4 ;
-			var shData = partition.Asset.shData.GetData<uint>();
+			int shSize = UnsafeUtility.SizeOf<SHTableItemFloat32>() / 4;
+
 			m_GpuSHData.SetData(shData, 0, shSize * partition.StartIndex, partition.SplatCount * shSize);
 
 			//Merge other data
 			int otherDataSize = 4;
-			var otherData = partition.Asset.otherData.GetData<uint>();
+
 			m_GpuOtherData.SetData(otherData, 0, otherDataSize * partition.StartIndex, otherDataSize * partition.SplatCount);
 
+			posData.Dispose();
+			colorData.Dispose();
+			shData.Dispose();
+			otherData.Dispose();
 		}
+
 		public void ReserveResources(SplatPartition[] partitions)
 		{
 			_partitions = partitions;
+			_partitionsOrder = new int[partitions.Length];
+
+
 			m_ReservedSplatCount = partitions.Sum(p => p.SplatCount);
 
 			_combinedData = new CombinedSplatData(m_ReservedSplatCount, GaussianSplatAsset.ColorFormat.Float32x4);
@@ -266,11 +297,16 @@ namespace GaussianSplatting.Runtime
 			m_Sorter.InitializeIndices(ref m_GpuSortIndices);
 		}
 
-		public bool GatherAndSortSplatsForCamera(Camera cam)
+		public bool GatherPartitionsForCamera(Camera cam)
 		{
 			if (!_partitions.Any(p => p.ShouldRender))
 			{
 				return false;
+			}
+
+			foreach(var p in _partitions.Where(pa=> !pa.ShouldRender))
+			{
+				p.RenderOrder = 10000;
 			}
 
 			//TODO: sort partitions by render order
@@ -278,9 +314,39 @@ namespace GaussianSplatting.Runtime
 			{
 				return a.RenderOrder.CompareTo(b.RenderOrder);
 			});
+			//fixRenderOrder
+			UpdateRenderOrder();
+
 
 			return true;
 		}
+
+		//private void OnGUI()
+		//{
+		//	GUI.Label(new Rect(10,10,Screen.width-20,30), "Partitions to render: " + string.Join(", ", _partitions.Where(p => p.ShouldRender).Select(p => p.PartitionIndex)));
+
+		//}
+
+		void UpdateRenderOrder()
+		{
+			bool isCorrectOrder = true;
+			for (int idx = 0; idx < _partitions.Length; ++idx)
+			{
+				int expectedPartition = _partitions[idx].PartitionIndex;
+				int currentPartitionIdx = _partitionsOrder[idx];
+				if (expectedPartition != currentPartitionIdx)
+				{
+					isCorrectOrder = false;
+					break;
+				}
+			}
+			if (isCorrectOrder) return;
+
+			int[] correctedOrder = _partitions.Select(p => p.PartitionIndex).ToArray();
+			m_Sorter.ReorderPartitions(_partitions, ref _partitionsOrder, ref m_GpuSortDistances, ref m_GpuSortIndices);
+
+		}
+
 
 		public void Awake()
 		{
@@ -302,11 +368,6 @@ namespace GaussianSplatting.Runtime
 			Debug.Log("GaussianSplatRenderer - Start #03");
 
 		}
-
-		//private void OnEnable()
-		//{
-		//	GaussianSplatRenderSystem.instance.SetSplatActive(this, true);
-		//}
 
 		void SetAssetDataOnCS(CommandBuffer cmb, KernelIndices kernel)
 		{
@@ -385,11 +446,6 @@ namespace GaussianSplatting.Runtime
 			DestroyImmediate(m_MatDebugPoints);
 			DestroyImmediate(m_MatDebugBoxes);
 		}
-
-		//private void OnDisable()
-		//{
-		//	GaussianSplatRenderSystem.instance.SetSplatActive(this, false);
-		//}
 
 		internal void CalcViewData(CommandBuffer cmb, Camera cam, Matrix4x4 matrix)
 		{

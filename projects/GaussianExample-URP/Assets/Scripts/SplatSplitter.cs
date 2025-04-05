@@ -1,8 +1,6 @@
-using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.NetworkInformation;
-using UnityEditor.VersionControl;
 using UnityEngine;
 
 namespace GaussianSplatting.Runtime
@@ -48,7 +46,7 @@ namespace GaussianSplatting.Runtime
 				_bounds[idx] = CalculateBounds(idx);
 			}
 			_partitions = new Dictionary<int, SplatPartition>();
-		
+
 		}
 		// Update is called once per frame
 		void Update()
@@ -57,23 +55,47 @@ namespace GaussianSplatting.Runtime
 			{
 				if (!_partitions.ContainsKey(idx)) continue;
 				if (_partitions[idx] == null) continue;
-				_partitions[idx].enabled = IsVisibleInCamera(idx);
+				if (_partitions[idx].StartIndex == -1) continue;
+
+				_partitions[idx].gameObject.SetActive(IsVisibleInCamera(idx));
 
 				//TODO: update rendering order
-				if (_partitions[idx].enabled)
+				if (_partitions[idx].ShouldRender)
 				{
 					Vector3 toCenter = _bounds[idx].center - Camera.main.transform.position;
 					toCenter.y = 0f;
-					_partitions[idx].RenderOrder = (uint)Mathf.RoundToInt(toCenter.sqrMagnitude);
+					_partitions[idx].RenderOrder = Mathf.RoundToInt(toCenter.sqrMagnitude);
 				}
 
 			}
 		}
+
+		public int[] GetPartitionOrder()
+		{
+			(int index, int order)[] orderArray = new (int, int)[NumColumns * NumRows];
+			for (int idx = 0; idx < orderArray.Length; ++idx)
+			{
+				Vector3 toCenter = _bounds[idx].center - Camera.main.transform.position;
+				toCenter.y = 0f;
+				orderArray[idx].index = idx;
+				orderArray[idx].order = Mathf.RoundToInt(toCenter.sqrMagnitude);
+				if (!IsVisibleInCamera(idx))
+				{
+					orderArray[idx].order += 1000;
+				}
+			
+			}
+
+			Array.Sort(orderArray, (a, b) => { return a.order.CompareTo(b.order); });
+			return orderArray.Select(t => t.index).ToArray();
+		}
+
 		public SplatPartition CreatePartition(int partitionIndex)
 		{
 			GameObject instance = GameObject.Instantiate(_splatPartitionPrefab, transform);
 			instance.transform.localRotation = Quaternion.identity;
 			instance.transform.localScale = Vector3.one;
+			instance.gameObject.SetActive(false);
 			if (partitionIndex >= 0)
 			{
 				Bounds b = GetBounds(partitionIndex);
@@ -82,11 +104,16 @@ namespace GaussianSplatting.Runtime
 			}
 			else
 			{
+
 				instance.transform.position = transform.position;
 			}
 
 			var partition = instance.GetComponent<SplatPartition>();
 			partition.PartitionIndex = partitionIndex;
+			if (partitionIndex == -1)
+			{
+				partition.RenderOrder = 1000;
+			}
 			_partitions.Add(partitionIndex, partition);
 			return partition;
 		}
@@ -101,16 +128,18 @@ namespace GaussianSplatting.Runtime
 			var partition = _partitions[partitionIndex];
 			partition.Asset = asset;
 
+			GaussianSplatRenderSystem.instance.SetSplatActive(partition, true);
+			partition.enabled = true;
 			if (IsVisibleInCamera(partitionIndex))
 			{
-				partition.enabled = true;
+				partition.gameObject.SetActive(true);
 			}
-			_defaultRenderer.OnPartitionLoaded(partition);
 		}
 
 		bool IsVisibleInCamera(int partitionIndex)
 		{
 			if (partitionIndex == -1) return true;
+
 			//Shoot 16 rays (4x4) from camera to bounds
 			Bounds bounds = GetBounds(partitionIndex);
 			if (bounds.Contains(Camera.main.transform.position))

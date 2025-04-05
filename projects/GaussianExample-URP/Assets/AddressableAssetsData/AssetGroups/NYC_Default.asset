@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: NYC_Default
   m_EditorClassIdentifier: 
   m_GroupName: NYC_Default
-  m_GUID: bbf8c9d1774543b4ca3d2dd2634f5d3e
+  m_GUID: 8110ef72de22f194094cf3fb55044c4b
   m_SerializeEntries:
   - m_GUID: 119062b36ed6dad41b603a6e99f7d04e
     m_Address: Assets/GaussianAssets/nyc_splat/nyc_splat_Default_pos.bytes

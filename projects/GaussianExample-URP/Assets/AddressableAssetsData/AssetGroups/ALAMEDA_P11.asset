@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ALAMEDA_P11
   m_EditorClassIdentifier: 
   m_GroupName: ALAMEDA_P11
-  m_GUID: d5067f78e2b5bf24faf47e76db325e44
+  m_GUID: 327bb96a311c0524bbac5550e504728f
   m_SerializeEntries:
   - m_GUID: 1f9d392738185f04582c7e756affd3ae
     m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_P11_pos.bytes

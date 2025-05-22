@@ -22,6 +22,9 @@ namespace GaussianSplatting.Runtime
 		[SerializeField]
 		private GameObject _splatPartitionPrefab;
 
+		[SerializeField]
+		private Texture2D _uiTexture;
+
 #if UNITY_EDITOR
 		private void OnValidate()
 		{
@@ -136,7 +139,11 @@ namespace GaussianSplatting.Runtime
 			}
 		}
 
-		bool IsVisibleInCamera(int partitionIndex)
+		public SplatPartition GetPartition(int partitionIndex)
+		{
+			return _partitions.GetValueOrDefault(partitionIndex);
+		}
+		public bool IsVisibleInCamera(int partitionIndex)
 		{
 			if (partitionIndex == -1) return true;
 
@@ -198,9 +205,19 @@ namespace GaussianSplatting.Runtime
 				for (int col = 0; col < NumColumns; ++col)
 				{
 					int partitionIndex = GetPartitionIndex(row, col);
+
+				
 					if (Application.isPlaying && !IsVisibleInCamera(partitionIndex)) continue;
-					Gizmos.color = Color.yellow;
+
 					Bounds bounds = CalculateBounds(partitionIndex, 10);
+					//if (partitionIndex == 0)
+					//{
+					//	Gizmos.color = Color.red;
+					//	Vector3 min = bounds.min;
+					//	min.y = 0f;
+					//	Gizmos.DrawWireSphere(min, 1f);
+					//}
+					Gizmos.color = Color.yellow;
 					Gizmos.DrawWireCube(bounds.center, bounds.size);
 				}
 			}
@@ -214,7 +231,7 @@ namespace GaussianSplatting.Runtime
 		}
 #endif
 
-		private int GetPartitionIndex(int row, int column)
+		public int GetPartitionIndex(int row, int column)
 		{
 			return row * NumColumns + column;
 		}

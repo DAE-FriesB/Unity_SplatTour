@@ -26,6 +26,7 @@ namespace GaussianSplatting.Editor
 		public bool CanCreateSplitter => _splitter == null && SplitterOwner != null;
 		public GameObject SplitterOwner { get; set; }
 
+		public int NumAssetsToCreate => _splitter == null? 0:  _splitter.NumColumns * _splitter.NumRows + 1;
 		public void AutoDetectSplitterInScene()
 		{
 			_splitter = GameObject.FindAnyObjectByType<SplatSplitter>();
@@ -72,7 +73,7 @@ namespace GaussianSplatting.Editor
 			int numChunkIndexes = _splitter.NumColumns * _splitter.NumRows;
 			chunkIdxProp.intValue = EditorGUILayout.IntSlider("Main Index", _splitter.MainChunkIndex, 0, numChunkIndexes - 1);
 			obj.ApplyModifiedProperties();
-
+			EditorGUI.indentLevel--;
 		}
 
 		public Dictionary<int, NativeArray<InputSplatData>> CalculatePartitions(NativeArray<InputSplatData> inputData)

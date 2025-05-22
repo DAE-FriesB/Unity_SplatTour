@@ -175,16 +175,19 @@ namespace GaussianSplatting.Editor
 			//Splitting settings
 			_toggleSplitSettings = EditorGUILayout.BeginToggleGroup("Splat Splitting", _toggleSplitSettings);
 			_splitConfig.DrawEditorGUI(_toggleSplitSettings);
-			_bundleName = EditorGUILayout.TextField("Bundle_Prefix", _bundleName);
+			EditorGUILayout.Space();
+			GUILayout.Label("Addressables", EditorStyles.boldLabel);
+			EditorGUI.indentLevel++;
+			EditorGUILayout.Toggle("Make addressables", true);
+			_bundleName = EditorGUILayout.TextField("Addressables prefix", _bundleName);
 			if(string.IsNullOrWhiteSpace(_bundleName))
 				_bundleName  = Path.GetFileNameWithoutExtension(FilePickerControl.PathToDisplayString(m_InputFile));
-
+			EditorGUI.indentLevel--;
 			EditorGUILayout.EndToggleGroup();
-
 			EditorGUILayout.Space();
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(30);
-			if (GUILayout.Button("Create Asset"))
+			if (GUILayout.Button($"Create {_splitConfig.NumAssetsToCreate} Assets"))
 			{
 				CreateAsset();
 			}

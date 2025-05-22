@@ -662,7 +662,7 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   scriptingDefineSymbols:
-    WebGL: SORT_NONE
+    WebGL: SORT_CPU
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}
@@ -781,11 +781,11 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: 8ee851fa-85e0-4036-8d0f-fd65d8334085
+  cloudProjectId: 6aa0fa57-b1b8-4bab-ae24-b77b26b84612
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
   projectName: SplatTour
-  organizationId: friesboury
+  organizationId: 60c489d-f9e5-4105-b433-7f6d8f718cbf
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}

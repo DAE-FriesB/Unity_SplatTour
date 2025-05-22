@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _logEditorFPS: 0
   _logEditorLoading: 1
-  _buildBenchmark: 1
-  _editorBenchmark: 1
+  _buildBenchmark: 0
+  _editorBenchmark: 0

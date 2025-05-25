@@ -19,8 +19,6 @@ public class SplatAssetInfo
 
 	public string Name;
 
-
-
 	public AssetReferenceT<GaussianSplatAsset> Asset;
 
 	public int NumSplats;
@@ -154,8 +152,6 @@ public class SplatLoader : MonoBehaviour
 
 #else
 		LoadSplat(_defaultSplatAsset, -1);
-
-	
 
 		foreach(int idx in orderedIndices)
 		{

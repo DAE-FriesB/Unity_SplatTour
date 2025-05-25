@@ -1282,7 +1282,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mapCellPrefab: {fileID: 2615286190555498647, guid: f1589e48dae73c74b9ac77037ece2dc5, type: 3}
   _splitter: {fileID: 1609192438}
-  _cellSize: 20
+  _cellSize: 10
   _fovIndicator: {fileID: 1978087592}
 --- !u!114 &255495316
 MonoBehaviour:
@@ -5419,7 +5419,7 @@ MonoBehaviour:
     ShouldLoad: 1
     Name: nyc_splat_Default
     Asset:
-      m_AssetGUID: acd27fab4534dfb4e9d2ce60172c2443
+      m_AssetGUID: 920f4092ccfe21e47b5d18ca02b055ab
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
@@ -5430,122 +5430,482 @@ MonoBehaviour:
   - ShouldLoad: 1
     Name: nyc_splat_P00
     Asset:
-      m_AssetGUID: 183e3061490ea4742bf7552166154448
+      m_AssetGUID: a0dd14ac695e3f841acefc5f78b744d9
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
-    NumSplats: 203
+    NumSplats: 9
     ColorFormat: 0
   - ShouldLoad: 1
     Name: nyc_splat_P01
     Asset:
-      m_AssetGUID: 9fde5156744fef94796f7e1160dbea2b
+      m_AssetGUID: a22d09dbe32bc8448aa99fa0d6bd46a7
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
-    NumSplats: 49821
+    NumSplats: 33
     ColorFormat: 0
   - ShouldLoad: 1
     Name: nyc_splat_P02
     Asset:
-      m_AssetGUID: 872384acf7228a7449d4738908bc5c57
+      m_AssetGUID: 3594bf422f3c6ca408caed190c39e405
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
-    NumSplats: 83976
+    NumSplats: 92
     ColorFormat: 0
   - ShouldLoad: 1
     Name: nyc_splat_P03
     Asset:
-      m_AssetGUID: ec17aff6bc9fbb5478e5ab706dd6e1a1
+      m_AssetGUID: fb4f15ad7a50b5044ab3425ca1c7ddc4
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
-    NumSplats: 870
+    NumSplats: 1188
     ColorFormat: 0
   - ShouldLoad: 1
     Name: nyc_splat_P04
     Asset:
-      m_AssetGUID: 6d3bb3ce29cb8b345939b9faf29399f7
+      m_AssetGUID: 29b83ca70c94c524396193a9af942275
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
-    NumSplats: 99476
+    NumSplats: 6951
     ColorFormat: 0
   - ShouldLoad: 1
     Name: nyc_splat_P05
     Asset:
-      m_AssetGUID: 79dceea04a1b489408ac7d5d8df9c096
+      m_AssetGUID: 4e1a0111a8c1eac499247c20abfa4237
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
-    NumSplats: 83808
+    NumSplats: 364
     ColorFormat: 0
   - ShouldLoad: 1
     Name: nyc_splat_P06
     Asset:
-      m_AssetGUID: dcc69cd77fc5f654c9b2e985b89676cc
+      m_AssetGUID: 2ed13654ff0f7694cb25500191817551
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
-    NumSplats: 30156
+    NumSplats: 35
     ColorFormat: 0
   - ShouldLoad: 1
     Name: nyc_splat_P07
     Asset:
-      m_AssetGUID: 82158fbe5812aaf4497f3c5d7f418df8
+      m_AssetGUID: 33fd6c2c4ba2b2848b0b5b86917bcf2b
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
-    NumSplats: 131498
+    NumSplats: 126
     ColorFormat: 0
   - ShouldLoad: 1
     Name: nyc_splat_P08
     Asset:
-      m_AssetGUID: 21453176b5350114cad3324856be47c9
+      m_AssetGUID: 3fa659326a40cd9439cc24e2145e571f
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
-    NumSplats: 79547
+    NumSplats: 374
     ColorFormat: 0
   - ShouldLoad: 1
     Name: nyc_splat_P09
     Asset:
-      m_AssetGUID: dbaf914a6cb864f48938e89274206527
+      m_AssetGUID: b48b67f40acf16b4cb018bc734bc4723
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
-    NumSplats: 32233
+    NumSplats: 48167
     ColorFormat: 0
   - ShouldLoad: 1
     Name: nyc_splat_P10
     Asset:
-      m_AssetGUID: 1145555bbc595214280c13a45daaf927
+      m_AssetGUID: 0ed3ab253301ba44abdfe822c235211b
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
-    NumSplats: 53658
+    NumSplats: 67197
     ColorFormat: 0
   - ShouldLoad: 1
     Name: nyc_splat_P11
     Asset:
-      m_AssetGUID: a194054b255e5944c9aa2b11db561354
+      m_AssetGUID: 84f06a6dce101c04ba238bb312599925
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
-    NumSplats: 37471
+    NumSplats: 9464
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P12
+    Asset:
+      m_AssetGUID: 3dcf294b437dc884ea56318588c5e94f
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 40
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P13
+    Asset:
+      m_AssetGUID: 3ee840789344f72498baba00db040b55
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 128
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P14
+    Asset:
+      m_AssetGUID: be53364431ec39144842c99ad0f4f2dd
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 841
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P15
+    Asset:
+      m_AssetGUID: 55274f1f27617bf48b7094c32d1857b0
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 35429
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P16
+    Asset:
+      m_AssetGUID: c71e5d3994762cd4685f7dd7ba2a0e95
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 43565
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P17
+    Asset:
+      m_AssetGUID: bc456077d1ed30445901fab3dfd13b78
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 6286
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P18
+    Asset:
+      m_AssetGUID: 7c203bb8afa278544bb455f8ad5f77af
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 55
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P19
+    Asset:
+      m_AssetGUID: 867ca670fb664ee49a1a194f7fa1e5cd
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 647
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P20
+    Asset:
+      m_AssetGUID: 85f600ae748a2aa44bef047ba2869274
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 20990
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P21
+    Asset:
+      m_AssetGUID: a075618910459ac4fbbd27a2a363afad
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 42216
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P22
+    Asset:
+      m_AssetGUID: ea3c03b47b9ca6a449a6f9ee442af47a
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 30465
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P23
+    Asset:
+      m_AssetGUID: 0c522a6b3c44b274ab0552af5880bea0
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 3492
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P24
+    Asset:
+      m_AssetGUID: 22f93888342290e4fb01ce0670a9b72c
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 176
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P25
+    Asset:
+      m_AssetGUID: baeb9f9a3bd21df4cb1b05c69135cf2f
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 10381
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P26
+    Asset:
+      m_AssetGUID: 39e1bb3a758e13343a5006268257bbf5
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 20301
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P27
+    Asset:
+      m_AssetGUID: b9f17446e5d9e384d865d37e8705495e
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 52739
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P28
+    Asset:
+      m_AssetGUID: e100596fe1300f6429e00d779153d9cd
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 48685
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P29
+    Asset:
+      m_AssetGUID: a241d436f9201a941baf53a7baf33188
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 4016
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P30
+    Asset:
+      m_AssetGUID: 1c93ff5b6d2d068418aa79e684b83a7f
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 2411
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P31
+    Asset:
+      m_AssetGUID: 7e941c1fea3432341a406029bfe1deb6
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 17188
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P32
+    Asset:
+      m_AssetGUID: 5b626092c79c6964aa77009a29c7104b
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 22849
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P33
+    Asset:
+      m_AssetGUID: 999d790ca9df6634693aa733e6ae1b7d
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 35609
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P34
+    Asset:
+      m_AssetGUID: a61adc32c9d5e214488e5ba5f96df862
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 25577
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P35
+    Asset:
+      m_AssetGUID: 9e5e8daac81dbcf49b3e24be43a605ea
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 1269
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P36
+    Asset:
+      m_AssetGUID: e13306ae5e3cadb42837b08b4c2d2563
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 6123
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P37
+    Asset:
+      m_AssetGUID: df20dcb57e8f03b46a8388e501bfcc36
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 17832
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P38
+    Asset:
+      m_AssetGUID: b9b7968eb8a245043a8cfbcb7147affc
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 22967
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P39
+    Asset:
+      m_AssetGUID: aeb2b66d9fda08a4195379e82c4edaa0
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 21532
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P40
+    Asset:
+      m_AssetGUID: 53cdc79b1f34cb943a14a8c884a944de
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 31544
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P41
+    Asset:
+      m_AssetGUID: 54098ba56242b01419f8481971fa87de
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 1723
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P42
+    Asset:
+      m_AssetGUID: d6a4a1ba77f089442bb1736b5c68602c
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 964
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P43
+    Asset:
+      m_AssetGUID: 771a5cd367e49d94cb332c64554e88f9
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 7314
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P44
+    Asset:
+      m_AssetGUID: aa1b201adac6f944aa8342eb80ea871a
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 2454
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P45
+    Asset:
+      m_AssetGUID: 123d5ea99db725f44a080b344dc2f3c4
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 6705
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P46
+    Asset:
+      m_AssetGUID: 17c255b8f0f88114f984cd77d84680ee
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 3828
+    ColorFormat: 0
+  - ShouldLoad: 1
+    Name: nyc_splat_P47
+    Asset:
+      m_AssetGUID: c79acc860f1b19944b66c2c09895c98a
+      m_SubObjectName: 
+      m_SubObjectGUID: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    NumSplats: 376
     ColorFormat: 0
 --- !u!114 &1609192438
 MonoBehaviour:
@@ -5559,11 +5919,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa10d52129ee37243b1b76c688c7e461, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PartitionSize: {x: 5.61, y: 5.76}
+  PartitionSize: {x: 2.805, y: 2.88}
   CenterOffset: {x: -1.53, y: 0}
-  NumRows: 4
-  NumColumns: 3
-  MainChunkIndex: 7
+  NumRows: 8
+  NumColumns: 6
+  MainChunkIndex: 26
   _splatPartitionPrefab: {fileID: 897796349755534670, guid: f87002cb09812ba478010448a9e3cebc, type: 3}
   _uiTexture: {fileID: 2800000, guid: 2cafa991e2be5564ea6c8bde6ae4d576, type: 3}
 --- !u!1 &1616556168

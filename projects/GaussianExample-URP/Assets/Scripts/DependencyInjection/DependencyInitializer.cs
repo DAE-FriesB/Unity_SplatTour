@@ -6,6 +6,7 @@ public class DependencyInitializer : MonoBehaviour
 	private DependencyConfig _config;
 	private void Awake()
 	{
+		if(_config)
 		_config.Build();
 	}
 }

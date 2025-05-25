@@ -13,6 +13,7 @@ var combinedChart = null;
 var startLoadTimeStamp = 0;
 var runningTime = 0;
 var maxFrameCount = 0;
+var loadedFirstSplat = false;
 const FRAME_STEP = 100;
 
 var currentFramePrefix = "S-1";

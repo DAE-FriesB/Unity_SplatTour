@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: DependencyConfig
   m_EditorClassIdentifier: 
   _logEditorFPS: 0
-  _logEditorLoading: 0
-  _buildBenchmark: 1
+  _logEditorLoading: 1
+  _buildBenchmark: 0
   _editorBenchmark: 0

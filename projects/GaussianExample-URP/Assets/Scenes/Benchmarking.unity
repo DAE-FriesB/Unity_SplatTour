@@ -209,7 +209,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _startSceneCamera: {fileID: 1918979314}
-  _sceneIndices: 0100000002000000
+  _sceneIndices: 01000000
+  _autoPlay: 0
 --- !u!1 &1918979314
 GameObject:
   m_ObjectHideFlags: 0

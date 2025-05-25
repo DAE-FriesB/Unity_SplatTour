@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: ALAMEDA_Default
+  m_EditorClassIdentifier: 
+  m_GroupName: ALAMEDA_Default
+  m_GUID: 3e1855aa90ecd2a43b4f853960684aba
+  m_SerializeEntries:
+  - m_GUID: 15d786017e6d0274cb3a9d81e12a4b49
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_Default_col.bytes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 34b12674326d84f48afc0d39dd131703
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_Default_oth.bytes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5dfbd49329ad85941be9468235cddea6
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_Default.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 77047f056b624eb429544def9202ebcc
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_Default_pos.bytes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b20ddfc54a5710e4ba05ed218a3718af
+    m_Address: Assets/GaussianAssets/CaptureTest-alameda-splat2-splat/CaptureTest-alameda-splat2-splat_Default_shs.bytes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 75d5932bbefdaef49a885ceb3c2c0753, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 9327dd456e24edc489d6540f23cb9cce, type: 2}
+    - {fileID: 11400000, guid: 8fe8f726229d4b344b42dd91266cd047, type: 2}

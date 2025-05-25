@@ -26,4 +26,5 @@
 /projects/**/obj/*
 /projects/GaussianExample-URP/Build
 /projects/GaussianExample-URP/.vs
+/projects/GaussianExample-URP/ServerData
 /projects/GaussianExample-URP/CCDBuildData

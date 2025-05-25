@@ -35,16 +35,16 @@ namespace Analysis.Logging
 		{
 			if (!_logLoading) return;
 
-			DateTimeOffset ts = DateTimeOffset.FromUnixTimeMilliseconds(timestamp);
-			Debug.Log($"[{ts}] Finished [{loadDataName}] ({durationMS} ms)");
+			//DateTimeOffset ts = DateTimeOffset.FromUnixTimeMilliseconds(timestamp);
+			Debug.Log($"[{timestamp}] Finished [{loadDataName}] (duration = {durationMS} ms)");
 		}
 
 		public void ReportLoadEventStarted(string loadDataName, long timestamp)
 		{
 			if (!_logLoading) return;
 
-			DateTimeOffset ts = DateTimeOffset.FromUnixTimeMilliseconds(timestamp);
-			Debug.Log($"[{ts}] Started [{loadDataName}]");
+			//DateTimeOffset ts = DateTimeOffset.FromUnixTimeMilliseconds(timestamp);
+			Debug.Log($"[{timestamp}] Started [{loadDataName}]");
 		}
 	}
 }

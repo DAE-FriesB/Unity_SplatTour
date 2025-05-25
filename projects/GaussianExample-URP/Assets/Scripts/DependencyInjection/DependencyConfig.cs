@@ -28,6 +28,7 @@ public class DependencyConfig : ScriptableObject
 		{
 			return _editorBenchmark ? new BenchmarkTimeService() : new DefaultTimeService();
 		});
+		
 #else
 
 		DependencyService.RegisterService<IPerformanceReporter>(() =>

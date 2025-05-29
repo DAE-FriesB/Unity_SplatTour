@@ -27,6 +27,24 @@ MonoBehaviour:
       m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
     - m_Suffix: LoadPath
       m_Value: '{UnityEngine.AddressableAssets.Addressables.RuntimePath}/[BuildTarget]'
+  - m_GroupTypePrefix: CCD.8ee851fa-85e0-4036-8d0f-fd65d8334085.3c9ce4c1-05f4-4b3a-9322-436c1c774860.466047c6-2179-4378-8639-a66c3d49db54.latest
+    m_Variables:
+    - m_Suffix: BuildPath
+      m_Value: CCDBuildData/3c9ce4c1-05f4-4b3a-9322-436c1c774860/466047c6-2179-4378-8639-a66c3d49db54/latest
+    - m_Suffix: CcdBadgeName
+      m_Value: latest
+    - m_Suffix: CcdBucketId
+      m_Value: 466047c6-2179-4378-8639-a66c3d49db54
+    - m_Suffix: CcdBucketName
+      m_Value: WebGL
+    - m_Suffix: Environmentid
+      m_Value: 3c9ce4c1-05f4-4b3a-9322-436c1c774860
+    - m_Suffix: Environmentname
+      m_Value: production
+    - m_Suffix: LoadPath
+      m_Value: https://8ee851fa-85e0-4036-8d0f-fd65d8334085.client-api.unity3dusercontent.com/client_api/v1/environments/production/buckets/466047c6-2179-4378-8639-a66c3d49db54/release_by_badge/latest/entry_by_path/content/?path=
+    - m_Suffix: PromoteOnly
+      m_Value: False
   - m_GroupTypePrefix: CCD.8ee851fa-85e0-4036-8d0f-fd65d8334085.3c9ce4c1-05f4-4b3a-9322-436c1c774860.62b6535c-6803-439b-a6d7-610a9ffd5c4b.latest
     m_Variables:
     - m_Suffix: BuildPath

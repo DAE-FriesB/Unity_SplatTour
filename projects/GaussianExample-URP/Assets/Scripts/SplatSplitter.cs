@@ -154,7 +154,7 @@ namespace GaussianSplatting.Runtime
 				return true;
 			}
 			int vertRays = 5;
-			int horRays = 5;
+			int horRays = 7;
 			float xSpacing = horRays <= 1 ? 0 : 1f / (horRays - 1);
 			float ySPacing = vertRays <= 1 ? 0 : 1f / (vertRays - 1);
 			float startX = horRays <= 1 ? 0.5f : 0f;

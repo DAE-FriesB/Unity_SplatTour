@@ -14,8 +14,10 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEditor;
+using UnityEditor.ShaderKeywordFilter;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
+using UnityEngine.AddressableAssets;
 
 namespace GaussianSplatting.Editor
 {
@@ -89,7 +91,7 @@ namespace GaussianSplatting.Editor
 
 		void OnGUI()
 		{
-			_splitConfig.AutoDetectSplitterInScene();
+			_splitConfig.AutoDetectSceneObjects();
 			EditorGUILayout.Space();
 			GUILayout.Label("Input data", EditorStyles.boldLabel);
 			var rect = EditorGUILayout.GetControlRect(true);
@@ -180,20 +182,26 @@ namespace GaussianSplatting.Editor
 			EditorGUI.indentLevel++;
 			EditorGUILayout.Toggle("Make addressables", true);
 			_bundleName = EditorGUILayout.TextField("Addressables prefix", _bundleName);
-			if(string.IsNullOrWhiteSpace(_bundleName))
-				_bundleName  = Path.GetFileNameWithoutExtension(FilePickerControl.PathToDisplayString(m_InputFile));
+			if (string.IsNullOrWhiteSpace(_bundleName))
+				_bundleName = Path.GetFileNameWithoutExtension(FilePickerControl.PathToDisplayString(m_InputFile));
 			EditorGUI.indentLevel--;
 			EditorGUILayout.EndToggleGroup();
 			EditorGUILayout.Space();
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(30);
+			GUILayout.BeginVertical();
 			if (GUILayout.Button($"Create {_splitConfig.NumAssetsToCreate} Assets"))
 			{
 				CreateAsset();
 			}
+			//Apply in SplatLoader
+			GUI.enabled = _splitConfig.SplatLoader != null;
+			if (GUILayout.Button($"Set partitions in SplatLoader"))
+			{
+				SetSplatLoaderAssets();
+			}
+			GUILayout.EndVertical();
 			GUILayout.Space(30);
-			
-			
 			GUILayout.EndHorizontal();
 
 
@@ -201,6 +209,51 @@ namespace GaussianSplatting.Editor
 			{
 				EditorGUILayout.HelpBox(m_ErrorMessage, MessageType.Error);
 			}
+		}
+
+		void SetSplatLoaderAssets()
+		{
+			if (_splitConfig?.SplatLoader == null || _splitConfig?.Splitter == null) return;
+			//Calculate partition asset names
+			string originalName = Path.GetFileNameWithoutExtension(FilePickerControl.PathToDisplayString(m_InputFile));
+			int numPartitions = _splitConfig.Splitter.NumRows * _splitConfig.Splitter.NumColumns;
+		
+			//fetch properties
+			SerializedObject so = new SerializedObject(_splitConfig.SplatLoader);
+			SerializedProperty arrayProperty = so.FindProperty("_splatAssets");
+			SerializedProperty defaultProperty = so.FindProperty("_defaultSplatAsset");
+
+			//clear previous array
+			arrayProperty.ClearArray();
+
+			//Add assets
+			for (int partitionIdx = -1; partitionIdx < numPartitions; ++partitionIdx)
+			{
+				string partitionSuffix = partitionIdx == -1 ? "Default" : $"P{partitionIdx:D2}";
+
+				string baseName = originalName + $"_{partitionSuffix}";
+				string assetPath = $"{m_OutputFolder}/{originalName}/{baseName}.asset";
+
+				SerializedProperty infoProperty;
+				//Index -1 = default asset
+				if (partitionIdx == -1)
+				{
+					infoProperty = defaultProperty;
+				}
+				else
+				{
+					arrayProperty.InsertArrayElementAtIndex(partitionIdx);
+					infoProperty = arrayProperty.GetArrayElementAtIndex(partitionIdx);
+				}
+
+				GUID assetGuid = AssetDatabase.GUIDFromAssetPath(assetPath);
+				SplatAssetInfo info = new SplatAssetInfo();
+				info.Asset = new AssetReferenceT<GaussianSplatAsset>(assetGuid.ToString());
+				info.ShouldLoad = true;
+				infoProperty.boxedValue = info;
+			}
+
+			so.ApplyModifiedProperties();
 		}
 
 		void ApplyQualityLevel()
@@ -392,7 +445,7 @@ namespace GaussianSplatting.Editor
 
 				List<string> assetPaths = new List<string>() { assetPath, pathPos, pathOther, pathCol, pathSh };
 				if (useChunks) assetPaths.Add(pathChunk);
-				_splitConfig.CreateAddressables(_bundleName+"_"+partitionSuffix, assetPaths);
+				_splitConfig.CreateAddressables(_bundleName + "_" + partitionSuffix, assetPaths);
 
 				inputSplats.Dispose();
 			}
@@ -1032,11 +1085,11 @@ namespace GaussianSplatting.Editor
 				m_Output[i] = new float4(splat.dc0.x, splat.dc0.y, splat.dc0.z, splat.opacity);
 			}
 		}
-		
+
 		void CreateColorDataBasic(NativeArray<InputSplatData> inputSplats, string filePath, ref Hash128 dataHash)
 		{
 			NativeArray<byte> data = new NativeArray<byte>(inputSplats.Length * 16, Allocator.TempJob);
-			
+
 			CreateColorDataJob2 simpleConvert = new CreateColorDataJob2()
 			{
 				m_Input = inputSplats,

@@ -14,32 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_GroupName: nyc_splat_S_P07
   m_GUID: bb67ee4728c483c408757147d45f54d2
-  m_SerializeEntries:
-  - m_GUID: 03f873a8733809942a0a051ca7e78831
-    m_Address: Assets/GaussianAssets/nyc_splat/nyc_splat_P07_col.bytes
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 33fd6c2c4ba2b2848b0b5b86917bcf2b
-    m_Address: Assets/GaussianAssets/nyc_splat/nyc_splat_P07.asset
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 95167c1fa7bc79447a566d32202e1251
-    m_Address: Assets/GaussianAssets/nyc_splat/nyc_splat_P07_shs.bytes
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: af15e5a64d242e147aa1475ffbfdf416
-    m_Address: Assets/GaussianAssets/nyc_splat/nyc_splat_P07_oth.bytes
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c45a962ecd6eb6446ad9b56fc34a0f75
-    m_Address: Assets/GaussianAssets/nyc_splat/nyc_splat_P07_pos.bytes
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
+  m_SerializeEntries: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 75d5932bbefdaef49a885ceb3c2c0753, type: 2}
   m_SchemaSet:

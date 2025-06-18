@@ -5123,8 +5123,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1462254335}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.06536348, y: -0.00030103835, z: 0.00006301523, w: -0.99786144}
-  m_LocalPosition: {x: -22.560558, y: 1.576127, z: -0.9390459}
+  m_LocalRotation: {x: 0.08525587, y: -0.044461824, z: 0.0038083044, w: 0.9953593}
+  m_LocalPosition: {x: -20.81422, y: 1.5999999, z: -2.110417}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5416,10 +5416,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _defaultSplatAsset:
-    ShouldLoad: 1
+    ShouldLoad: 0
     Name: nyc_splat_Default
     Asset:
-      m_AssetGUID: acd27fab4534dfb4e9d2ce60172c2443
+      m_AssetGUID: 920f4092ccfe21e47b5d18ca02b055ab
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
@@ -5430,7 +5430,7 @@ MonoBehaviour:
   - ShouldLoad: 1
     Name: nyc_splat_P00
     Asset:
-      m_AssetGUID: 183e3061490ea4742bf7552166154448
+      m_AssetGUID: a0dd14ac695e3f841acefc5f78b744d9
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
@@ -5440,7 +5440,7 @@ MonoBehaviour:
   - ShouldLoad: 1
     Name: nyc_splat_P01
     Asset:
-      m_AssetGUID: 9fde5156744fef94796f7e1160dbea2b
+      m_AssetGUID: a22d09dbe32bc8448aa99fa0d6bd46a7
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
@@ -5450,7 +5450,7 @@ MonoBehaviour:
   - ShouldLoad: 1
     Name: nyc_splat_P02
     Asset:
-      m_AssetGUID: 872384acf7228a7449d4738908bc5c57
+      m_AssetGUID: 3594bf422f3c6ca408caed190c39e405
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
@@ -5460,7 +5460,7 @@ MonoBehaviour:
   - ShouldLoad: 1
     Name: nyc_splat_P03
     Asset:
-      m_AssetGUID: ec17aff6bc9fbb5478e5ab706dd6e1a1
+      m_AssetGUID: fb4f15ad7a50b5044ab3425ca1c7ddc4
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
@@ -5470,7 +5470,7 @@ MonoBehaviour:
   - ShouldLoad: 1
     Name: nyc_splat_P04
     Asset:
-      m_AssetGUID: 6d3bb3ce29cb8b345939b9faf29399f7
+      m_AssetGUID: 29b83ca70c94c524396193a9af942275
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
@@ -5480,7 +5480,7 @@ MonoBehaviour:
   - ShouldLoad: 1
     Name: nyc_splat_P05
     Asset:
-      m_AssetGUID: 79dceea04a1b489408ac7d5d8df9c096
+      m_AssetGUID: 4e1a0111a8c1eac499247c20abfa4237
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
@@ -5490,7 +5490,7 @@ MonoBehaviour:
   - ShouldLoad: 1
     Name: nyc_splat_P06
     Asset:
-      m_AssetGUID: dcc69cd77fc5f654c9b2e985b89676cc
+      m_AssetGUID: 2ed13654ff0f7694cb25500191817551
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
@@ -5500,7 +5500,7 @@ MonoBehaviour:
   - ShouldLoad: 1
     Name: nyc_splat_P07
     Asset:
-      m_AssetGUID: 82158fbe5812aaf4497f3c5d7f418df8
+      m_AssetGUID: 33fd6c2c4ba2b2848b0b5b86917bcf2b
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
@@ -5510,7 +5510,7 @@ MonoBehaviour:
   - ShouldLoad: 1
     Name: nyc_splat_P08
     Asset:
-      m_AssetGUID: 21453176b5350114cad3324856be47c9
+      m_AssetGUID: 3fa659326a40cd9439cc24e2145e571f
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
@@ -5520,7 +5520,7 @@ MonoBehaviour:
   - ShouldLoad: 1
     Name: nyc_splat_P09
     Asset:
-      m_AssetGUID: dbaf914a6cb864f48938e89274206527
+      m_AssetGUID: b48b67f40acf16b4cb018bc734bc4723
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
@@ -5530,7 +5530,7 @@ MonoBehaviour:
   - ShouldLoad: 1
     Name: nyc_splat_P10
     Asset:
-      m_AssetGUID: 1145555bbc595214280c13a45daaf927
+      m_AssetGUID: 0ed3ab253301ba44abdfe822c235211b
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
@@ -5540,7 +5540,7 @@ MonoBehaviour:
   - ShouldLoad: 1
     Name: nyc_splat_P11
     Asset:
-      m_AssetGUID: a194054b255e5944c9aa2b11db561354
+      m_AssetGUID: 84f06a6dce101c04ba238bb312599925
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
@@ -5560,10 +5560,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PartitionSize: {x: 5.61, y: 5.76}
-  CenterOffset: {x: -1.53, y: 0}
+  CenterOffset: {x: -1.53, y: 0, z: 0}
   NumRows: 4
   NumColumns: 3
   MainChunkIndex: 7
+  _boundsHeight: 50
   _splatPartitionPrefab: {fileID: 897796349755534670, guid: f87002cb09812ba478010448a9e3cebc, type: 3}
   _uiTexture: {fileID: 2800000, guid: 2cafa991e2be5564ea6c8bde6ae4d576, type: 3}
 --- !u!1 &1616556168

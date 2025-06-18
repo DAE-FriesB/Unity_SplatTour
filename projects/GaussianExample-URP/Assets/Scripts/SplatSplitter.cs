@@ -9,13 +9,14 @@ namespace GaussianSplatting.Runtime
 	{
 		//Split settings
 		public Vector2 PartitionSize;
-		public Vector2 CenterOffset;
+		public Vector3 CenterOffset;
 		public int NumRows;
 		public int NumColumns;
 		public int MainChunkIndex;
 
 		private Bounds[] _bounds = null;
-		private const float _boundsHeight = 50f;
+		[SerializeField]
+		private float _boundsHeight = 50f;
 
 		private GaussianSplatRenderer _defaultRenderer;
 		private Dictionary<int, SplatPartition> _partitions;
@@ -33,7 +34,7 @@ namespace GaussianSplatting.Runtime
 			_bounds = new Bounds[NumRows * NumColumns];
 			for (int idx = 0; idx < _bounds.Length; ++idx)
 			{
-				_bounds[idx] = CalculateBounds(idx);
+				_bounds[idx] = CalculateBounds(idx, _boundsHeight);
 			}
 			_partitions = new Dictionary<int, SplatPartition>();
 
@@ -46,7 +47,7 @@ namespace GaussianSplatting.Runtime
 			_bounds = new Bounds[NumRows * NumColumns];
 			for (int idx = 0; idx < _bounds.Length; ++idx)
 			{
-				_bounds[idx] = CalculateBounds(idx);
+				_bounds[idx] = CalculateBounds(idx, _boundsHeight);
 			}
 			_partitions = new Dictionary<int, SplatPartition>();
 
@@ -209,7 +210,7 @@ namespace GaussianSplatting.Runtime
 				
 					if (Application.isPlaying && !IsVisibleInCamera(partitionIndex)) continue;
 
-					Bounds bounds = CalculateBounds(partitionIndex, 10);
+					Bounds bounds = CalculateBounds(partitionIndex, _boundsHeight);
 					//if (partitionIndex == 0)
 					//{
 					//	Gizmos.color = Color.red;
@@ -240,10 +241,10 @@ namespace GaussianSplatting.Runtime
 		{
 			return _bounds[partitionIndex];
 		}
-		private Bounds CalculateBounds(int partitionIndex, float height = _boundsHeight)
+		private Bounds CalculateBounds(int partitionIndex, float height)
 		{
 			Vector3 chunkSize = new Vector3(PartitionSize.x, height, PartitionSize.y);
-			Vector3 center = transform.position + new Vector3(CenterOffset.x, 0f, CenterOffset.y);
+			Vector3 center = transform.position + CenterOffset;
 			Vector3 startPos = center - new Vector3(chunkSize.x * (NumColumns - 1) / 2f, 0, chunkSize.z * (NumRows - 1) / 2f);
 
 			int row = partitionIndex / NumColumns;
